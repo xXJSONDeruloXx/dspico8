@@ -363,4 +363,22 @@ mod tests {
         core.map_draw(0, 0, 20, 20, 1, 1);
         assert_eq!(core.pget(20, 20), 11);
     }
+
+    #[test]
+    fn fset_and_fget_round_trip() {
+        let mut core = RuntimeCore::new();
+        core.fset(3, Some(2), 1);
+        assert_eq!(core.fget(3, Some(2)), 1);
+        core.fset(3, None, 0xaa);
+        assert_eq!(core.fget(3, None), 0xaa);
+    }
+
+    #[test]
+    fn clip_prevents_outside_writes() {
+        let mut core = RuntimeCore::new();
+        core.clip(Some(10), Some(10), Some(10), Some(10));
+        core.rectfill(0, 0, 30, 30, Some(12));
+        assert_eq!(core.pget(5, 5), 0);
+        assert_eq!(core.pget(12, 12), 12);
+    }
 }

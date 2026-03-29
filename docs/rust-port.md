@@ -79,6 +79,7 @@ Current rule of thumb:
 ### Phase 2 — execution bridge
 
 - [x] minimal Lua bridge in Rust exists for desktop benchmarking
+- [x] desktop-subset bindings now cover core draw calls plus `btn`, `btnp`, `fget`, `fset`, and `rnd`
 - keep unsafe contained to the binding layer
 - reuse the current API subset as the initial parity target
 
@@ -87,6 +88,7 @@ Current rule of thumb:
 - run desktop tests for Rust modules
 - add desktop microbenchmarks for Rust runtime pieces
 - compare against the current C++ clean runtime and FAKE-08 baseline
+- keep widening benchmark coverage with carts that exercise more of the implemented API subset
 
 ### Phase 4 — DS integration
 

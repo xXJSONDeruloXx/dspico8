@@ -39,6 +39,7 @@ Current Rust work focuses on:
 - safe `.p8.png` cart parsing
 - safe framebuffer / sprite / map core primitives
 - a minimal Lua bridge for desktop benchmarking
+- desktop-subset API coverage including `btn`, `btnp`, `fget`, `fset`, and `rnd`
 - probes for investigating user-supplied official `pico8.dat`
 
 This is the preferred landing zone for new clean-runtime foundation work while the C++ native runtime remains the current DS reference implementation.
@@ -161,10 +162,13 @@ Controls:
 
 ## Benchmarks
 
-Current desktop microbenchmarks show the clean native runtime ahead of the FAKE-08-derived baseline on the included stress carts:
+Current desktop microbenchmarks compare three runtimes:
 
-- `fillrate.p8`: native faster
-- `sprite_stress.p8`: native faster
+- FAKE-08-derived baseline
+- current clean native C++ runtime
+- Rust prototype runtime
+
+On the current included carts, the Rust prototype is the fastest of the three on desktop, but it is still a desktop prototype and is not yet wired into the DS build.
 
 See `docs/benchmarks.md` for the raw numbers.
 

@@ -50,6 +50,7 @@ c++ -O3 -std=c++17 \
 CARTS=(
   "$ROOT_DIR/bench/carts/fillrate.p8"
   "$ROOT_DIR/bench/carts/sprite_stress.p8"
+  "$ROOT_DIR/bench/carts/api_mix.p8"
 )
 
 RESULTS_FILE="$BENCH_DIR/results.txt"

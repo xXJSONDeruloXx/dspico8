@@ -4,8 +4,9 @@ Desktop microbenchmarks comparing the FAKE-08-derived baseline, the current clea
 
 | Cart | Fake08 us/frame | Native C++ us/frame | Native Rust us/frame | Fastest runtime | Rust vs C++ |
 | --- | ---: | ---: | ---: | --- | ---: |
-| `fillrate.p8` | 128.70 | 84.64 | 43.20 | native-rs | 1.96x |
-| `sprite_stress.p8` | 219.98 | 65.83 | 44.07 | native-rs | 1.49x |
+| `api_mix.p8` | 32.81 | 12.24 | 6.75 | native-rs | 1.81x |
+| `fillrate.p8` | 127.65 | 82.15 | 40.99 | native-rs | 2.00x |
+| `sprite_stress.p8` | 220.20 | 65.03 | 45.09 | native-rs | 1.44x |
 
 ## Emulator smoke notes
 
@@ -21,10 +22,13 @@ Desktop microbenchmarks comparing the FAKE-08-derived baseline, the current clea
 ## Raw output
 
 ```text
-runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=128.70 fps_equivalent=7770.01
-runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=84.64 fps_equivalent=11815.44
-runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=43.20 fps_equivalent=23149.04
-runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=219.98 fps_equivalent=4545.94
-runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=65.83 fps_equivalent=15191.41
-runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=44.07 fps_equivalent=22692.89
+runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=127.65 fps_equivalent=7833.72
+runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=82.15 fps_equivalent=12173.35
+runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=40.99 fps_equivalent=24394.21
+runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=220.20 fps_equivalent=4541.33
+runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=65.03 fps_equivalent=15377.52
+runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=45.09 fps_equivalent=22175.41
+runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=32.81 fps_equivalent=30481.61
+runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=12.24 fps_equivalent=81710.47
+runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=6.75 fps_equivalent=148111.58
 ```

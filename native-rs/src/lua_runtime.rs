@@ -23,6 +23,7 @@ pub struct lua_State {
 const LUA_OK: c_int = 0;
 const LUA_REGISTRYINDEX: c_int = -1001000;
 const LUA_TNIL: c_int = 0;
+const LUA_TBOOLEAN: c_int = 1;
 const LUA_TFUNCTION: c_int = 6;
 static RUNTIME_KEY: u8 = 0;
 
@@ -42,6 +43,7 @@ extern "C" {
     fn lua_getglobal(l: *mut lua_State, name: *const c_char) -> c_int;
     fn lua_setglobal(l: *mut lua_State, name: *const c_char);
     fn lua_settop(l: *mut lua_State, idx: c_int);
+    fn lua_gettop(l: *mut lua_State) -> c_int;
     fn lua_type(l: *mut lua_State, idx: c_int) -> c_int;
     fn lua_pushinteger(l: *mut lua_State, n: lua_Integer);
     fn lua_pushnumber(l: *mut lua_State, n: lua_Number);
@@ -302,21 +304,105 @@ unsafe extern "C" fn api_print(l: *mut lua_State) -> c_int {
     1
 }
 
+unsafe extern "C" fn api_fget(l: *mut lua_State) -> c_int {
+    let runtime = get_runtime(l);
+    let sprite = opt_integer(l, 1).unwrap_or(0) as u8;
+    if let Some(bit) = opt_integer(l, 2) {
+        let bit = (bit & 7) as u8;
+        lua_pushboolean(l, (runtime.core.fget(sprite, Some(bit)) != 0) as c_int);
+    } else {
+        lua_pushinteger(l, runtime.core.fget(sprite, None) as lua_Integer);
+    }
+    1
+}
+
+unsafe extern "C" fn api_fset(l: *mut lua_State) -> c_int {
+    let runtime = get_runtime(l);
+    let sprite = opt_integer(l, 1).unwrap_or(0) as u8;
+    let top = unsafe { lua_gettop(l) };
+    if top >= 3 && unsafe { lua_type(l, 3) } == LUA_TBOOLEAN {
+        let bit = (opt_integer(l, 2).unwrap_or(0) & 7) as u8;
+        let value = unsafe { lua_toboolean(l, 3) != 0 };
+        runtime
+            .core
+            .fset(sprite, Some(bit), if value { 1 } else { 0 });
+    } else {
+        let value = opt_integer(l, 2).unwrap_or(0) as u8;
+        runtime.core.fset(sprite, None, value);
+    }
+    0
+}
+
 unsafe extern "C" fn api_btn(l: *mut lua_State) -> c_int {
-    lua_pushboolean(l, 0);
+    let runtime = get_runtime(l);
+    if is_none_or_nil(l, 1) {
+        lua_pushinteger(l, runtime.input.held as lua_Integer);
+        return 1;
+    }
+
+    let bit = opt_integer(l, 1).unwrap_or(0);
+    if bit < 0 {
+        lua_pushboolean(l, 0);
+    } else {
+        lua_pushboolean(
+            l,
+            (((runtime.input.held >> (bit as u8 & 7)) & 0x1) != 0) as c_int,
+        );
+    }
     1
 }
 
 unsafe extern "C" fn api_btnp(l: *mut lua_State) -> c_int {
-    lua_pushboolean(l, 0);
+    let runtime = get_runtime(l);
+    if is_none_or_nil(l, 1) {
+        lua_pushinteger(l, runtime.input.down as lua_Integer);
+        return 1;
+    }
+
+    let bit = opt_integer(l, 1).unwrap_or(0);
+    if bit < 0 {
+        lua_pushboolean(l, 0);
+    } else {
+        lua_pushboolean(
+            l,
+            (((runtime.input.down >> (bit as u8 & 7)) & 0x1) != 0) as c_int,
+        );
+    }
     1
+}
+
+unsafe extern "C" fn api_rnd(l: *mut lua_State) -> c_int {
+    let runtime = get_runtime(l);
+    let unit = runtime.next_random();
+    let value = match opt_number(l, 1) {
+        Some(bound) => unit * bound,
+        None => unit,
+    };
+    lua_pushnumber(l, value as lua_Number);
+    1
+}
+
+unsafe extern "C" fn api_pal(_: *mut lua_State) -> c_int {
+    0
+}
+
+unsafe extern "C" fn api_palt(_: *mut lua_State) -> c_int {
+    0
+}
+
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+pub struct InputState {
+    pub down: u8,
+    pub held: u8,
 }
 
 pub struct LuaRuntime {
     lua: *mut lua_State,
     core: RuntimeCore,
+    input: InputState,
     time_seconds: f64,
     frame_count: u64,
+    rng_state: u64,
 }
 
 impl Default for LuaRuntime {
@@ -336,8 +422,10 @@ impl LuaRuntime {
         Self {
             lua: ptr::null_mut(),
             core: RuntimeCore::new(),
+            input: InputState::default(),
             time_seconds: 0.0,
             frame_count: 0,
+            rng_state: 0xD5C1C08u64,
         }
     }
 
@@ -356,8 +444,10 @@ impl LuaRuntime {
     pub fn load_cart(&mut self, cart: &Cart) -> Result<(), String> {
         self.reset_lua();
         self.core.load_cart(cart);
+        self.input = InputState::default();
         self.time_seconds = 0.0;
         self.frame_count = 0;
+        self.rng_state = 0xD5C1C08u64;
 
         let state = unsafe { luaL_newstate() };
         if state.is_null() {
@@ -411,16 +501,6 @@ all = function(t)
     return t[i]
   end
 end
-rnd = function(x)
-  if x == nil then return 0.5 end
-  return 0.5 * x
-end
-fget = function(n, bit)
-  return 0
-end
-fset = function(n, bit, value)
-  return nil
-end
 "#,
         )
         .map_err(|e| format!("failed to build helper source: {e}"))?;
@@ -434,6 +514,11 @@ end
     }
 
     pub fn step(&mut self, time_seconds: f64) -> Result<(), String> {
+        self.step_with_input(InputState::default(), time_seconds)
+    }
+
+    pub fn step_with_input(&mut self, input: InputState, time_seconds: f64) -> Result<(), String> {
+        self.input = input;
         self.time_seconds = time_seconds;
         self.frame_count += 1;
 
@@ -442,6 +527,16 @@ end
         }
         self.call_if_exists("_draw")?;
         Ok(())
+    }
+
+    fn next_random(&mut self) -> f64 {
+        let mut x = self.rng_state;
+        x ^= x << 13;
+        x ^= x >> 7;
+        x ^= x << 17;
+        self.rng_state = x;
+        let mantissa = (x >> 11) as f64;
+        mantissa / ((1u64 << 53) as f64)
     }
 
     fn reset_lua(&mut self) {
@@ -477,6 +572,8 @@ end
         reg!("mget", api_mget);
         reg!("mset", api_mset);
         reg!("map", api_map);
+        reg!("fget", api_fget);
+        reg!("fset", api_fset);
         reg!("camera", api_camera);
         reg!("clip", api_clip);
         reg!("time", api_time);
@@ -485,6 +582,9 @@ end
         reg!("print", api_print);
         reg!("btn", api_btn);
         reg!("btnp", api_btnp);
+        reg!("rnd", api_rnd);
+        reg!("pal", api_pal);
+        reg!("palt", api_palt);
     }
 
     fn do_string(&mut self, source: &CStr) -> Result<(), String> {
@@ -531,7 +631,7 @@ end
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::load_cart_from_path;
+    use crate::{load_cart_from_path, load_cart_from_source};
 
     #[test]
     fn rust_lua_runtime_steps_fillrate_cart() {
@@ -542,5 +642,50 @@ mod tests {
         runtime.step(0.0).expect("runtime should step");
         assert_eq!(runtime.frame_count(), 1);
         assert!(runtime.frame_buffer().iter().any(|&v| v != 0));
+    }
+
+    #[test]
+    fn rust_lua_runtime_supports_buttons_flags_and_random() {
+        let cart = load_cart_from_source(
+            "inline:test",
+            r#"pico-8 cartridge // http://www.pico-8.com
+version 42
+__lua__
+function _init()
+ fset(0,2,true)
+end
+
+function _draw()
+ cls(0)
+ if fget(0,2) then pset(0,0,7) end
+ if btn(4) then pset(1,0,8) end
+ if btnp(5) then pset(2,0,9) end
+ if btn() == 48 then pset(3,0,10) end
+ if btnp() == 32 then pset(4,0,11) end
+ pset(5,0,flr(rnd(16)))
+end
+"#,
+        )
+        .expect("inline cart should parse");
+
+        let mut runtime = LuaRuntime::new();
+        runtime.load_cart(&cart).expect("runtime should load cart");
+        runtime
+            .step_with_input(
+                InputState {
+                    down: 1 << 5,
+                    held: (1 << 4) | (1 << 5),
+                },
+                0.0,
+            )
+            .expect("runtime should step with input");
+
+        let fb = runtime.frame_buffer();
+        assert_eq!(fb[0], 7);
+        assert_eq!(fb[1], 8);
+        assert_eq!(fb[2], 9);
+        assert_eq!(fb[3], 10);
+        assert_eq!(fb[4], 11);
+        assert!(fb[5] < 16);
     }
 }

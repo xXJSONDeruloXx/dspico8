@@ -28,7 +28,8 @@
 - [x] Add repeatable desktop benchmark carts
 - [x] Add a benchmark runner comparing baseline vs native runtime
 - [x] Record current results in `docs/benchmarks.md`
-- [ ] Expand benchmark coverage to more real-world carts and API mixes
+- [x] Add an API-mix benchmark cart that exercises more of the clean-runtime subset
+- [ ] Expand benchmark coverage further to more real-world carts
 
 ## Phase 4 — Emulator and hardware validation
 
