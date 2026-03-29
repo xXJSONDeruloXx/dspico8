@@ -101,16 +101,17 @@ Current rule of thumb:
 - [x] extract a `no_std`-friendly core crate (`native-rs-core/`)
 - [x] prove that core crate builds for `armv5te-none-eabi`
 - [x] build a DS smoke target that links against that Rust core
-- compile more of the Rust runtime as a static library for the DS build
+- [x] cross-build a reduced `no_std` / `alloc` form of the full `native-rs/` crate for `armv5te-none-eabi`
+- [x] build a DS smoke target that links the full Rust runtime staticlib through the C ABI
 - [x] start parameterizing the DS-native entry path so cart loading/runtime bootstrap can swap to the Rust wrapper without rewriting the whole ARM9 loop
 - keep ARM7 / ARM9 shell minimal at first
 - prove frame loop, cart loading, and rendering on emulator / hardware
 
-Current blocker for the full `native-rs/` crate on bare-metal ARM:
+Current blocker for the full Rust runtime replacing the clean C++ runtime in the main DS build:
 
-- the Lua bridge still depends on a C toolchain / libc-facing layer (`onelua.c`)
-- higher-level layers still use `std`-oriented facilities
-- so the migration path is to keep peeling portable pieces into `native-rs-core/` first, then shrink the remaining boundary
+- the reduced DS-targeted Rust build currently focuses on path/source/FFI/runtime execution rather than the full desktop feature set
+- `.p8.png` and broader std-heavy conveniences are still not part of the DS-targeted build configuration
+- the main shipped clean DS runtime has not yet been switched from the C++ runtime to the Rust runtime smoke path
 
 ### Phase 5 — expansion
 
@@ -126,4 +127,5 @@ For now:
 - `native/` remains the working C++ reference runtime
 - `native-rs/` becomes the preferred destination for new clean-runtime work
 - host-side callers can now target the Rust runtime through a thin C++ wrapper without adopting Rust directly
+- the DS path now has both a Rust-core smoke target and a full-Rust-runtime smoke target as migration anchors
 - avoid large new C++ compatibility features unless they are strictly needed to unblock the Rust path

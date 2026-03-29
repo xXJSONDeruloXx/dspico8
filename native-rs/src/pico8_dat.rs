@@ -1,3 +1,6 @@
+use alloc::string::String;
+use alloc::vec::Vec;
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DatHit {
     pub offset: usize,

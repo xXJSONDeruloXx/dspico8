@@ -43,6 +43,8 @@ Current Rust work focuses on:
 - a C ABI so host code can call the Rust runtime directly
 - a thin C++ wrapper so existing host-side code can swap onto the Rust runtime with the same `LoadCartFromPath` / `LoadCartFromSource` / `Step` / `FrameBuffer` shape
 - direct Rust cart loading from path/source in that wrapper path, so host-side Rust-wrapper builds do not need the C++ cart parser
+- a reduced `no_std` / `alloc` runtime build that now cross-builds for `armv5te-none-eabi`
+- a DS smoke target that links the full Rust runtime staticlib
 - probes for investigating user-supplied official `pico8.dat`
 
 This is the preferred landing zone for new clean-runtime foundation work while the C++ native runtime remains the current DS reference implementation.
@@ -67,6 +69,7 @@ This lets us measure speed and behavior against the previous implementation whil
 - `docs/benchmarks.md`
 - `docs/framehashes.md`
 - `docs/rust-port.md`
+- `docs/hybrid-target.md`
 - `docs/official-pico8-investigation.md`
 
 ## Build
@@ -114,6 +117,12 @@ Check that the extracted `no_std` Rust core builds for the DS-class bare-metal A
 make rust-core-arm-check
 ```
 
+Check that the reduced `no_std` full Rust runtime also cross-builds for `armv5te-none-eabi`:
+
+```bash
+make rust-runtime-arm-check
+```
+
 Build the new native Nintendo DS artifact:
 
 ```bash
@@ -150,6 +159,18 @@ Output:
 platform/nds-rust-core/DSPICO8-RUST-CORE.nds
 ```
 
+Build the full-Rust-runtime DS smoke artifact:
+
+```bash
+make nds-rust-runtime-smoke
+```
+
+Output:
+
+```text
+platform/nds-rust-runtime/DSPICO8-RUST-RUNTIME.nds
+```
+
 ### Docker build
 
 ```bash
@@ -158,11 +179,12 @@ platform/nds-rust-core/DSPICO8-RUST-CORE.nds
 
 This expects a running Docker daemon and uses the `devkitpro/devkitarm` image.
 
-It now emits three DS artifacts under `artifacts/`:
+It now emits four DS artifacts under `artifacts/`:
 
 - `DSPICO8.nds`
 - `DSPICO8-FAKE08-BASELINE.nds`
 - `DSPICO8-RUST-CORE.nds`
+- `DSPICO8-RUST-RUNTIME.nds`
 
 ### Rust probes
 
@@ -203,17 +225,23 @@ Controls:
 
 ## Benchmarks
 
-Current desktop microbenchmarks compare three runtimes:
+Current desktop microbenchmarks compare four runtime paths:
 
 - FAKE-08-derived baseline
 - current clean native C++ runtime
-- Rust prototype runtime
+- Rust runtime through the C++ host wrapper
+- Rust runtime directly from Rust
 
-On the current included carts, the Rust prototype is the fastest of the three on desktop, but it is still a desktop prototype and is not yet wired into the DS build.
+On the current included carts, the Rust runtime remains the fastest implementation on desktop microbenchmarks.
 
 For three shared subset carts, the Rust and C++ runtimes currently produce identical framebuffer hashes after the same number of steps.
 
-The extracted `native-rs-core/` crate also now builds for `armv5te-none-eabi`, and a local DS smoke target now links that Rust core into `platform/nds-rust-core/DSPICO8-RUST-CORE.nds`. That is a useful DS-readiness milestone even though the full Rust runtime is not yet cross-building.
+The extracted `native-rs-core/` crate builds for `armv5te-none-eabi`, and the reduced `no_std` / `alloc` full Rust runtime now also cross-builds for `armv5te-none-eabi`. There are now two DS smoke milestones:
+
+- `platform/nds-rust-core/DSPICO8-RUST-CORE.nds` links the extracted Rust core
+- `platform/nds-rust-runtime/DSPICO8-RUST-RUNTIME.nds` links the full Rust runtime staticlib through the C ABI
+
+The main shipped clean DS runtime still has not been swapped over to Rust yet, but the full-Rust-runtime DS smoke target is a major integration milestone toward that goal.
 
 See `docs/benchmarks.md` and `docs/framehashes.md` for the raw numbers.
 

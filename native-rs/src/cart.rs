@@ -1,19 +1,37 @@
 use crate::{MAP_HEIGHT, MAP_WIDTH, SPRITE_SHEET_HEIGHT, SPRITE_SHEET_WIDTH};
 
-use std::fs;
+use alloc::format;
+use alloc::string::String;
+#[cfg(feature = "png")]
+use alloc::string::ToString;
+#[cfg(feature = "png")]
+use alloc::vec;
+use alloc::vec::Vec;
+#[cfg(feature = "png")]
 use std::io::Cursor;
-use std::path::Path;
+#[cfg(feature = "std")]
+use std::{fs, path::Path};
 
+#[cfg(feature = "png")]
 const LEGACY_COMPRESSION_LUT: &[u8] =
     b"\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_";
+#[cfg(feature = "png")]
 const PNG_WIDTH: usize = 160;
+#[cfg(feature = "png")]
 const PNG_HEIGHT: usize = 205;
+#[cfg(feature = "png")]
 const ROM_GFX_BYTES: usize = 0x2000;
+#[cfg(feature = "png")]
 const ROM_MAP_LO_BYTES: usize = 0x1000;
+#[cfg(feature = "png")]
 const ROM_FLAGS_BYTES: usize = 0x0100;
+#[cfg(feature = "png")]
 const ROM_MUSIC_BYTES: usize = 0x0100;
+#[cfg(feature = "png")]
 const ROM_SFX_BYTES: usize = 0x1100;
+#[cfg(feature = "png")]
 const ROM_CODE_BYTES: usize = 0x3d00;
+#[cfg(feature = "png")]
 const ROM_TOTAL_BYTES: usize = 0x8001;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -46,6 +64,7 @@ enum Section {
     Gff,
 }
 
+#[cfg(feature = "std")]
 pub fn load_cart_from_path(path: impl AsRef<Path>) -> Result<Cart, String> {
     let path = path.as_ref();
     let bytes =
@@ -59,7 +78,14 @@ pub fn load_cart_from_source(name: &str, source: &str) -> Result<Cart, String> {
 
 pub fn load_cart_from_bytes(name: &str, bytes: &[u8]) -> Result<Cart, String> {
     if bytes.starts_with(b"\x89PNG") {
-        load_cart_from_png(name, bytes)
+        #[cfg(feature = "png")]
+        {
+            return load_cart_from_png(name, bytes);
+        }
+        #[cfg(not(feature = "png"))]
+        {
+            return Err(format!("png carts unsupported in this build for {name}"));
+        }
     } else if bytes.starts_with(b"pico-8 cartridge") {
         let source = String::from_utf8_lossy(bytes);
         parse_p8_text(name, &source)
@@ -186,6 +212,7 @@ fn parse_flag_line(line: &str, row: usize, cart: &mut Cart) {
     }
 }
 
+#[cfg(feature = "png")]
 fn load_cart_from_png(name: &str, bytes: &[u8]) -> Result<Cart, String> {
     let mut decoder = png::Decoder::new(Cursor::new(bytes));
     decoder.set_transformations(png::Transformations::EXPAND | png::Transformations::STRIP_16);
@@ -213,6 +240,7 @@ fn load_cart_from_png(name: &str, bytes: &[u8]) -> Result<Cart, String> {
     unpack_png_cart(name, &rgba)
 }
 
+#[cfg(feature = "png")]
 fn convert_to_rgba8(pixels: &[u8], info: &png::OutputInfo) -> Result<Vec<u8>, String> {
     let pixel_count = (info.width as usize) * (info.height as usize);
     let mut out = Vec::with_capacity(pixel_count * 4);
@@ -242,6 +270,7 @@ fn convert_to_rgba8(pixels: &[u8], info: &png::OutputInfo) -> Result<Vec<u8>, St
     Ok(out)
 }
 
+#[cfg(feature = "png")]
 fn unpack_png_cart(name: &str, rgba: &[u8]) -> Result<Cart, String> {
     if rgba.len() < PNG_WIDTH * PNG_HEIGHT * 4 {
         return Err(format!("decoded image too small for {name}"));
@@ -298,6 +327,7 @@ fn unpack_png_cart(name: &str, rgba: &[u8]) -> Result<Cart, String> {
     Ok(cart)
 }
 
+#[cfg(feature = "png")]
 fn decode_lua_block(code: &[u8]) -> Result<Vec<u8>, String> {
     if code.len() < 8 {
         return Err("lua block too small".to_string());
@@ -313,6 +343,7 @@ fn decode_lua_block(code: &[u8]) -> Result<Vec<u8>, String> {
     }
 }
 
+#[cfg(feature = "png")]
 fn decode_legacy_compressed(code: &[u8]) -> Result<Vec<u8>, String> {
     let length = ((code[4] as usize) << 8) | (code[5] as usize);
     let mut out = Vec::with_capacity(length);
@@ -356,11 +387,13 @@ fn decode_legacy_compressed(code: &[u8]) -> Result<Vec<u8>, String> {
     Ok(out)
 }
 
+#[cfg(feature = "png")]
 #[derive(Clone)]
 struct MoveToFront {
     state: [u8; 256],
 }
 
+#[cfg(feature = "png")]
 impl MoveToFront {
     fn new() -> Self {
         let mut state = [0u8; 256];
@@ -381,12 +414,14 @@ impl MoveToFront {
     }
 }
 
+#[cfg(feature = "png")]
 struct BitReader<'a> {
     bytes: &'a [u8],
     pos_bits: usize,
     max_bits: usize,
 }
 
+#[cfg(feature = "png")]
 impl<'a> BitReader<'a> {
     fn new(bytes: &'a [u8], pos_bits: usize, max_bytes: usize) -> Self {
         Self {
@@ -410,6 +445,7 @@ impl<'a> BitReader<'a> {
     }
 }
 
+#[cfg(feature = "png")]
 fn decode_pxa(code: &[u8]) -> Result<Vec<u8>, String> {
     let length = ((code[4] as usize) << 8) | (code[5] as usize);
     let compressed = ((code[6] as usize) << 8) | (code[7] as usize);
@@ -476,7 +512,7 @@ fn decode_pxa(code: &[u8]) -> Result<Vec<u8>, String> {
     Ok(out)
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "std"))]
 mod tests {
     use super::*;
     use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
@@ -491,6 +527,7 @@ mod tests {
         assert_eq!(cart.flags.len(), 256);
     }
 
+    #[cfg(feature = "png")]
     #[test]
     fn parses_repo_png_cart() {
         let cart = load_cart_from_path("../test/carts/cartparsetest.p8.png")
@@ -498,6 +535,7 @@ mod tests {
         assert!(!cart.lua.is_empty());
     }
 
+    #[cfg(feature = "png")]
     #[test]
     fn parses_legacy_repo_png_cart() {
         let cart = load_cart_from_path("../test/carts/test_legacypng_cart.p8.png")

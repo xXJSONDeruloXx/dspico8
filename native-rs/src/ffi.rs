@@ -1,8 +1,11 @@
-use crate::{load_cart_from_path, load_cart_from_source, InputState, LuaRuntime};
+use crate::{load_cart_from_source, InputState, LuaRuntime};
 
-use std::ffi::{CStr, CString};
-use std::os::raw::c_char;
-use std::ptr;
+use alloc::boxed::Box;
+use alloc::ffi::CString;
+use alloc::format;
+use alloc::string::String;
+use core::ffi::{c_char, CStr};
+use core::ptr;
 
 #[repr(C)]
 pub struct dsp_rs_input_state {
@@ -97,21 +100,33 @@ pub extern "C" fn dsp_rs_runtime_load_cart_from_path(
         }
     };
 
-    match load_cart_from_path(path_str) {
-        Ok(cart) => match handle.runtime.load_cart(&cart) {
-            Ok(()) => {
-                handle.clear_error();
-                true
-            }
+    #[cfg(feature = "std")]
+    {
+        match crate::load_cart_from_path(path_str) {
+            Ok(cart) => match handle.runtime.load_cart(&cart) {
+                Ok(()) => {
+                    handle.clear_error();
+                    true
+                }
+                Err(error) => {
+                    handle.set_error(error);
+                    false
+                }
+            },
             Err(error) => {
                 handle.set_error(error);
                 false
             }
-        },
-        Err(error) => {
-            handle.set_error(error);
-            false
         }
+    }
+
+    #[cfg(not(feature = "std"))]
+    {
+        let _ = path_str;
+        handle.set_error(String::from(
+            "path loading is unavailable in this no_std build",
+        ));
+        false
     }
 }
 

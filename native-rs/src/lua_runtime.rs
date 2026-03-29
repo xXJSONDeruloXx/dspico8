@@ -1,8 +1,10 @@
 use crate::{Cart, RuntimeCore};
 
-use std::ffi::{CStr, CString};
-use std::os::raw::{c_char, c_int};
-use std::ptr;
+use alloc::ffi::CString;
+use alloc::format;
+use alloc::string::{String, ToString};
+use core::ffi::{c_char, c_int, c_void, CStr};
+use core::ptr;
 
 #[allow(non_camel_case_types)]
 type lua_Integer = i64;
@@ -49,8 +51,8 @@ extern "C" {
     fn lua_pushnumber(l: *mut lua_State, n: lua_Number);
     fn lua_pushboolean(l: *mut lua_State, b: c_int);
     fn lua_pushcclosure(l: *mut lua_State, f: lua_CFunction, n: c_int);
-    fn lua_rawgetp(l: *mut lua_State, idx: c_int, p: *const std::ffi::c_void) -> c_int;
-    fn lua_rawsetp(l: *mut lua_State, idx: c_int, p: *const std::ffi::c_void);
+    fn lua_rawgetp(l: *mut lua_State, idx: c_int, p: *const c_void) -> c_int;
+    fn lua_rawsetp(l: *mut lua_State, idx: c_int, p: *const c_void);
     fn lua_toboolean(l: *mut lua_State, idx: c_int) -> c_int;
     fn lua_tointegerx(l: *mut lua_State, idx: c_int, isnum: *mut c_int) -> lua_Integer;
     fn lua_tonumberx(l: *mut lua_State, idx: c_int, isnum: *mut c_int) -> lua_Number;
@@ -115,7 +117,7 @@ fn get_runtime(l: *mut lua_State) -> &'static mut LuaRuntime {
         lua_rawgetp(
             l,
             LUA_REGISTRYINDEX,
-            &RUNTIME_KEY as *const _ as *const std::ffi::c_void,
+            &RUNTIME_KEY as *const _ as *const c_void,
         );
         let ptr = lua_tointegerx(l, -1, ptr::null_mut());
         lua_pop(l, 1);
@@ -129,7 +131,7 @@ fn set_runtime(l: *mut lua_State, runtime: *mut LuaRuntime) {
         lua_rawsetp(
             l,
             LUA_REGISTRYINDEX,
-            &RUNTIME_KEY as *const _ as *const std::ffi::c_void,
+            &RUNTIME_KEY as *const _ as *const c_void,
         );
     }
 }

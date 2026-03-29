@@ -72,6 +72,8 @@
 
 - [x] Prove the extracted Rust core builds for `armv5te-none-eabi`
 - [x] Build a DS smoke target that links against `native-rs-core`
+- [x] Cross-build a reduced `no_std` / `alloc` full Rust runtime for `armv5te-none-eabi`
+- [x] Build a DS smoke target that links the full Rust runtime staticlib
 - [ ] Compile the Rust runtime core into the main DS build
 - [x] Start parameterizing the main ARM9 startup path so a Rust-backed runtime can own cart loading/bootstrap without rewriting the full loop
 - [ ] Confirm rendered output from the Rust-core smoke target in emulator/hardware
@@ -100,5 +102,6 @@ The project is on the right track when:
 - both baseline and clean DS builds are reproducible,
 - Rust foundations are covered by tests,
 - the extracted Rust core is demonstrably portable toward the DS target,
+- the reduced full Rust runtime is also demonstrably cross-buildable toward the DS target,
 - benchmarks show where the clean runtime is winning or losing,
 - and prereleases ship the generated `.nds` files for comparison.

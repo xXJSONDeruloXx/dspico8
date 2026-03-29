@@ -18,8 +18,10 @@ exec docker run --rm \
     make nds
     make nds-baseline
     make nds-rust-core-smoke
+    make nds-rust-runtime-smoke
     mkdir -p artifacts
     cp platform/nds-native/DSPICO8.nds artifacts/DSPICO8.nds
     cp platform/nds/DSPICO8.nds artifacts/DSPICO8-FAKE08-BASELINE.nds
     cp platform/nds-rust-core/DSPICO8-RUST-CORE.nds artifacts/DSPICO8-RUST-CORE.nds
+    cp platform/nds-rust-runtime/DSPICO8-RUST-RUNTIME.nds artifacts/DSPICO8-RUST-RUNTIME.nds
   '
