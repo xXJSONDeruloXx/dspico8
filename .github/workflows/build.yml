@@ -67,3 +67,4 @@ jobs:
           files: |
             artifacts/DSPICO8.nds
             artifacts/DSPICO8-FAKE08-BASELINE.nds
+            artifacts/DSPICO8-RUST-CORE.nds
