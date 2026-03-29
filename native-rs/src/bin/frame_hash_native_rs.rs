@@ -11,8 +11,14 @@ fn fnv1a64(data: &[u8]) -> u64 {
 
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
-    let cart_path = args.get(1).map(String::as_str).unwrap_or("bench/carts/fillrate.p8");
-    let frames = args.get(2).and_then(|s| s.parse::<usize>().ok()).unwrap_or(120);
+    let cart_path = args
+        .get(1)
+        .map(String::as_str)
+        .unwrap_or("bench/carts/fillrate.p8");
+    let frames = args
+        .get(2)
+        .and_then(|s| s.parse::<usize>().ok())
+        .unwrap_or(120);
 
     let cart = match load_cart_from_path(cart_path) {
         Ok(cart) => cart,

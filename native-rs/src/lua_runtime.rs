@@ -443,7 +443,7 @@ impl LuaRuntime {
 
     pub fn load_cart(&mut self, cart: &Cart) -> Result<(), String> {
         self.reset_lua();
-        self.core.load_cart(cart);
+        self.core.load_assets(&cart.gfx, &cart.map, &cart.flags);
         self.input = InputState::default();
         self.time_seconds = 0.0;
         self.frame_count = 0;

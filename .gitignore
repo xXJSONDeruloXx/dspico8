@@ -1,6 +1,7 @@
 # build outputs
 .bench/
 .framehash/
+.ffi-smoke/
 artifacts/
 platform/nds/*.nds
 platform/nds/arm7/build/
@@ -11,6 +12,7 @@ platform/nds-native/arm9/build/
 test/build/
 test/testrunner.a
 native-rs/target/
+native-rs-core/target/
 *.elf
 *.map
 

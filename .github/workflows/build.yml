@@ -33,6 +33,9 @@ jobs:
       - name: Run Rust desktop tests
         run: make rust-tests
 
+      - name: Check Rust core bare-metal ARM build
+        run: make rust-core-arm-check
+
   nds:
     name: Build Nintendo DS artifacts
     runs-on: ubuntu-latest

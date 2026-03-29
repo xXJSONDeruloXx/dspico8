@@ -56,6 +56,7 @@
 - [x] Add safe Rust framebuffer / sprite / map primitives
 - [x] Add Rust probes for carts and `pico8.dat`
 - [x] Add Rust tests to CI
+- [x] Extract `native-rs-core/` as a `no_std`-friendly runtime core crate
 
 ## Phase 7 — Rust runtime execution parity
 
@@ -67,6 +68,7 @@
 
 ## Phase 8 — Rust DS integration
 
+- [x] Prove the extracted Rust core builds for `armv5te-none-eabi`
 - [ ] Compile the Rust runtime core into the DS build
 - [ ] Keep ARM7 / ARM9 platform glue minimal while swapping in Rust core pieces
 - [ ] Boot the Rust-backed native runtime in emulator
@@ -93,5 +95,6 @@ The project is on the right track when:
 - the repo is public and pushed,
 - both baseline and clean DS builds are reproducible,
 - Rust foundations are covered by tests,
+- the extracted Rust core is demonstrably portable toward the DS target,
 - benchmarks show where the clean runtime is winning or losing,
 - and prereleases ship the generated `.nds` files for comparison.

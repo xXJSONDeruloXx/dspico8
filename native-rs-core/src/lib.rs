@@ -1,7 +1,11 @@
-use crate::{
-    Cart, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SPRITE_SHEET_HEIGHT,
-    SPRITE_SHEET_WIDTH,
-};
+#![no_std]
+
+pub const SCREEN_WIDTH: usize = 128;
+pub const SCREEN_HEIGHT: usize = 128;
+pub const SPRITE_SHEET_WIDTH: usize = 128;
+pub const SPRITE_SHEET_HEIGHT: usize = 128;
+pub const MAP_WIDTH: usize = 128;
+pub const MAP_HEIGHT: usize = 64;
 
 #[derive(Clone, Debug)]
 pub struct RuntimeCore {
@@ -43,10 +47,15 @@ impl RuntimeCore {
         core
     }
 
-    pub fn load_cart(&mut self, cart: &Cart) {
-        self.sprite_sheet.copy_from_slice(&cart.gfx);
-        self.map.copy_from_slice(&cart.map);
-        self.flags.copy_from_slice(&cart.flags);
+    pub fn load_assets(
+        &mut self,
+        sprite_sheet: &[u8; SPRITE_SHEET_WIDTH * SPRITE_SHEET_HEIGHT],
+        map: &[u8; MAP_WIDTH * MAP_HEIGHT],
+        flags: &[u8; 256],
+    ) {
+        self.sprite_sheet.copy_from_slice(sprite_sheet);
+        self.map.copy_from_slice(map);
+        self.flags.copy_from_slice(flags);
         self.reset_draw_state();
     }
 
@@ -158,10 +167,10 @@ impl RuntimeCore {
         x1 -= self.camera_x;
         y1 -= self.camera_y;
         if x0 > x1 {
-            std::mem::swap(&mut x0, &mut x1);
+            core::mem::swap(&mut x0, &mut x1);
         }
         if y0 > y1 {
-            std::mem::swap(&mut y0, &mut y1);
+            core::mem::swap(&mut y0, &mut y1);
         }
         let color = color.unwrap_or(self.color) & 0x0f;
         for y in y0..=y1 {
@@ -177,10 +186,10 @@ impl RuntimeCore {
         x1 -= self.camera_x;
         y1 -= self.camera_y;
         if x0 > x1 {
-            std::mem::swap(&mut x0, &mut x1);
+            core::mem::swap(&mut x0, &mut x1);
         }
         if y0 > y1 {
-            std::mem::swap(&mut y0, &mut y1);
+            core::mem::swap(&mut y0, &mut y1);
         }
         let color = color.unwrap_or(self.color) & 0x0f;
         for x in x0..=x1 {
@@ -283,7 +292,7 @@ impl RuntimeCore {
     pub fn fget(&self, sprite: u8, bit: Option<u8>) -> u8 {
         let value = self.flags[sprite as usize];
         match bit {
-            Some(bit) => ((value >> (bit & 7)) & 0x1) as u8,
+            Some(bit) => (value >> (bit & 7)) & 0x1,
             None => value,
         }
     }
@@ -323,6 +332,9 @@ impl RuntimeCore {
         self.frame_buffer[y as usize * SCREEN_WIDTH + x as usize]
     }
 }
+
+#[cfg(test)]
+extern crate std;
 
 #[cfg(test)]
 mod tests {

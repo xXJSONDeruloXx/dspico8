@@ -44,8 +44,13 @@ name = "dsp-native-rs"
 version = "0.1.0"
 dependencies = [
  "cc",
+ "dsp-native-rs-core",
  "png",
 ]
+
+[[package]]
+name = "dsp-native-rs-core"
+version = "0.1.0"
 
 [[package]]
 name = "fdeflate"

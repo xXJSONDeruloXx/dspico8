@@ -6,7 +6,7 @@ export V_PATCH    := 0
 export V_BUILD    := 0
 export APP_VERSION := v$(V_MAJOR).$(V_MINOR).$(V_PATCH)
 
-.PHONY: all nds nds-baseline tests rust-tests benchmarks framehashes clean clean-nds clean-tests clean-rust
+.PHONY: all nds nds-baseline tests rust-tests benchmarks framehashes rust-ffi-smoke rust-core-arm-check clean clean-nds clean-tests clean-rust
 
 all: nds
 
@@ -21,6 +21,7 @@ tests:
 	cd test && ./testrunner.a
 
 rust-tests:
+	cargo test --manifest-path native-rs-core/Cargo.toml
 	cargo test --manifest-path native-rs/Cargo.toml
 
 benchmarks:
@@ -28,6 +29,12 @@ benchmarks:
 
 framehashes:
 	./scripts/compare-frame-hashes.sh
+
+rust-ffi-smoke:
+	./scripts/smoke-rust-ffi.sh
+
+rust-core-arm-check:
+	./scripts/check-rust-core-armv5te.sh
 
 clean: clean-nds clean-tests clean-rust
 
@@ -39,4 +46,4 @@ clean-tests:
 	@$(MAKE) -C test clean
 
 clean-rust:
-	rm -rf native-rs/target
+	rm -rf native-rs/target native-rs-core/target

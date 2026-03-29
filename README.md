@@ -37,9 +37,10 @@ Current Rust work focuses on:
 
 - safe `.p8` cart parsing
 - safe `.p8.png` cart parsing
-- safe framebuffer / sprite / map core primitives
+- a `no_std`-friendly extracted runtime core in `native-rs-core/`
 - a minimal Lua bridge for desktop benchmarking
 - desktop-subset API coverage including `btn`, `btnp`, `fget`, `fset`, and `rnd`
+- a C ABI so host code can call the Rust runtime directly
 - probes for investigating user-supplied official `pico8.dat`
 
 This is the preferred landing zone for new clean-runtime foundation work while the C++ native runtime remains the current DS reference implementation.
@@ -96,6 +97,18 @@ Run framebuffer-hash comparisons between the current C++ runtime and Rust runtim
 
 ```bash
 make framehashes
+```
+
+Smoke-test the Rust C ABI from a C++ host:
+
+```bash
+make rust-ffi-smoke
+```
+
+Check that the extracted `no_std` Rust core builds for the DS-class bare-metal ARM target:
+
+```bash
+make rust-core-arm-check
 ```
 
 Build the new native Nintendo DS artifact:
@@ -177,7 +190,9 @@ Current desktop microbenchmarks compare three runtimes:
 
 On the current included carts, the Rust prototype is the fastest of the three on desktop, but it is still a desktop prototype and is not yet wired into the DS build.
 
-For two shared subset carts, the Rust and C++ runtimes currently produce identical framebuffer hashes after the same number of steps.
+For three shared subset carts, the Rust and C++ runtimes currently produce identical framebuffer hashes after the same number of steps.
+
+The extracted `native-rs-core/` crate also now builds for `armv5te-none-eabi`, which is a useful DS-readiness milestone even though the full Rust runtime is not yet cross-building.
 
 See `docs/benchmarks.md` and `docs/framehashes.md` for the raw numbers.
 
