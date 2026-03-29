@@ -20,6 +20,10 @@ path = "src/bin/pico8_dat_probe.rs"
 name = "benchmark_native_rs"
 path = "src/bin/benchmark_native_rs.rs"
 
+[[bin]]
+name = "frame_hash_native_rs"
+path = "src/bin/frame_hash_native_rs.rs"
+
 [dependencies]
 png = "0.18"
 

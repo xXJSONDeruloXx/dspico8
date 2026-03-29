@@ -6,7 +6,7 @@ export V_PATCH    := 0
 export V_BUILD    := 0
 export APP_VERSION := v$(V_MAJOR).$(V_MINOR).$(V_PATCH)
 
-.PHONY: all nds nds-baseline tests rust-tests benchmarks clean clean-nds clean-tests clean-rust
+.PHONY: all nds nds-baseline tests rust-tests benchmarks framehashes clean clean-nds clean-tests clean-rust
 
 all: nds
 
@@ -25,6 +25,9 @@ rust-tests:
 
 benchmarks:
 	./scripts/run-benchmarks.sh
+
+framehashes:
+	./scripts/compare-frame-hashes.sh
 
 clean: clean-nds clean-tests clean-rust
 

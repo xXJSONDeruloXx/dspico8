@@ -29,6 +29,7 @@
 - [x] Add a benchmark runner comparing baseline vs native runtime
 - [x] Record current results in `docs/benchmarks.md`
 - [x] Add an API-mix benchmark cart that exercises more of the clean-runtime subset
+- [x] Add framebuffer-hash comparisons between the C++ and Rust runtimes on shared carts
 - [ ] Expand benchmark coverage further to more real-world carts
 
 ## Phase 4 — Emulator and hardware validation
@@ -62,6 +63,7 @@
 - [ ] Reach parity with the current clean C++ runtime subset
 - [x] Add benchmarkable Rust runtime stepping on desktop
 - [x] Compare Rust runtime performance against the current C++ clean runtime
+- [x] Prove identical framebuffer output on shared subset carts for at least the current benchmark pair
 
 ## Phase 8 — Rust DS integration
 

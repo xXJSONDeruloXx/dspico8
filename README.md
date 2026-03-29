@@ -61,6 +61,7 @@ This lets us measure speed and behavior against the previous implementation whil
 - `docs/architecture.md`
 - `docs/roadmap.md`
 - `docs/benchmarks.md`
+- `docs/framehashes.md`
 - `docs/rust-port.md`
 - `docs/official-pico8-investigation.md`
 
@@ -89,6 +90,12 @@ Run benchmark comparisons:
 
 ```bash
 make benchmarks
+```
+
+Run framebuffer-hash comparisons between the current C++ runtime and Rust runtime on shared carts:
+
+```bash
+make framehashes
 ```
 
 Build the new native Nintendo DS artifact:
@@ -170,7 +177,9 @@ Current desktop microbenchmarks compare three runtimes:
 
 On the current included carts, the Rust prototype is the fastest of the three on desktop, but it is still a desktop prototype and is not yet wired into the DS build.
 
-See `docs/benchmarks.md` for the raw numbers.
+For two shared subset carts, the Rust and C++ runtimes currently produce identical framebuffer hashes after the same number of steps.
+
+See `docs/benchmarks.md` and `docs/framehashes.md` for the raw numbers.
 
 ## Provenance
 

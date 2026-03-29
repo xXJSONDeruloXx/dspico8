@@ -1,5 +1,6 @@
 # build outputs
 .bench/
+.framehash/
 artifacts/
 platform/nds/*.nds
 platform/nds/arm7/build/

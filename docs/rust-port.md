@@ -89,6 +89,7 @@ Current rule of thumb:
 - add desktop microbenchmarks for Rust runtime pieces
 - compare against the current C++ clean runtime and FAKE-08 baseline
 - keep widening benchmark coverage with carts that exercise more of the implemented API subset
+- compare framebuffer hashes on shared carts so performance wins are paired with correctness checks
 
 ### Phase 4 — DS integration
 
