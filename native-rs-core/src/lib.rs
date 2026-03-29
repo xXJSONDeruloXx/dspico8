@@ -1,5 +1,7 @@
 #![no_std]
 
+use core::cell::UnsafeCell;
+
 pub const SCREEN_WIDTH: usize = 128;
 pub const SCREEN_HEIGHT: usize = 128;
 pub const SPRITE_SHEET_WIDTH: usize = 128;
@@ -331,6 +333,96 @@ impl RuntimeCore {
         }
         self.frame_buffer[y as usize * SCREEN_WIDTH + x as usize]
     }
+}
+
+struct GlobalRuntimeCell(UnsafeCell<Option<RuntimeCore>>);
+
+unsafe impl Sync for GlobalRuntimeCell {}
+
+static GLOBAL_RUNTIME: GlobalRuntimeCell = GlobalRuntimeCell(UnsafeCell::new(None));
+
+fn global_runtime_mut() -> &'static mut RuntimeCore {
+    unsafe {
+        let slot = &mut *GLOBAL_RUNTIME.0.get();
+        if slot.is_none() {
+            *slot = Some(RuntimeCore::new());
+        }
+        match slot.as_mut() {
+            Some(runtime) => runtime,
+            None => core::hint::unreachable_unchecked(),
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_core_global_reset() {
+    let runtime = global_runtime_mut();
+    *runtime = RuntimeCore::new();
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_core_global_frame_buffer() -> *const u8 {
+    let runtime = global_runtime_mut();
+    runtime.frame_buffer().as_ptr()
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_core_global_pset(x: i32, y: i32, color: i32) {
+    let runtime = global_runtime_mut();
+    runtime.pset(x, y, Some((color & 0x0f) as u8));
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_core_global_rectfill(x0: i32, y0: i32, x1: i32, y1: i32, color: i32) {
+    let runtime = global_runtime_mut();
+    runtime.rectfill(x0, y0, x1, y1, Some((color & 0x0f) as u8));
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_core_global_rect(x0: i32, y0: i32, x1: i32, y1: i32, color: i32) {
+    let runtime = global_runtime_mut();
+    runtime.rect(x0, y0, x1, y1, Some((color & 0x0f) as u8));
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_core_global_line(x0: i32, y0: i32, x1: i32, y1: i32, color: i32) {
+    let runtime = global_runtime_mut();
+    runtime.line(x0, y0, x1, y1, Some((color & 0x0f) as u8));
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_core_global_demo_frame(ticks: u32) {
+    let runtime = global_runtime_mut();
+    runtime.cls(Some(1));
+
+    let t = (ticks & 0xff) as i32;
+    for y in 0..16 {
+        for x in 0..16 {
+            let x0 = x * 8;
+            let y0 = y * 8;
+            let color = ((x + y + t / 4) & 0x0f) as u8;
+            runtime.rectfill(x0, y0, x0 + 7, y0 + 7, Some(color));
+        }
+    }
+
+    for i in 0..128 {
+        runtime.pset(i, (i + t) & 127, Some(7));
+    }
+
+    runtime.rect(8, 8, 119, 119, Some(8));
+    runtime.line(0, 127, 127, 0, Some(10));
+    runtime.rectfill(48, 48, 80, 80, Some(12));
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_core_global_frame_bytes() -> usize {
+    SCREEN_WIDTH * SCREEN_HEIGHT
+}
+
+#[cfg(all(target_os = "none", not(test)))]
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    loop {}
 }
 
 #[cfg(test)]

@@ -6,7 +6,7 @@ export V_PATCH    := 0
 export V_BUILD    := 0
 export APP_VERSION := v$(V_MAJOR).$(V_MINOR).$(V_PATCH)
 
-.PHONY: all nds nds-baseline tests rust-tests benchmarks framehashes rust-ffi-smoke rust-core-arm-check clean clean-nds clean-tests clean-rust
+.PHONY: all nds nds-baseline nds-rust-core-smoke tests rust-tests benchmarks framehashes rust-ffi-smoke rust-core-arm-check clean clean-nds clean-tests clean-rust
 
 all: nds
 
@@ -15,6 +15,9 @@ nds:
 
 nds-baseline:
 	@$(MAKE) -C platform/nds
+
+nds-rust-core-smoke:
+	@$(MAKE) -C platform/nds-rust-core
 
 tests:
 	@$(MAKE) -C test
@@ -41,6 +44,7 @@ clean: clean-nds clean-tests clean-rust
 clean-nds:
 	@$(MAKE) -C platform/nds-native clean
 	@$(MAKE) -C platform/nds clean
+	@$(MAKE) -C platform/nds-rust-core clean
 
 clean-tests:
 	@$(MAKE) -C test clean

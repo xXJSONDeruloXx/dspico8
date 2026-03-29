@@ -9,6 +9,9 @@ platform/nds/arm9/build/
 platform/nds-native/*.nds
 platform/nds-native/arm7/build/
 platform/nds-native/arm9/build/
+platform/nds-rust-core/*.nds
+platform/nds-rust-core/arm7/build/
+platform/nds-rust-core/arm9/build/
 test/build/
 test/testrunner.a
 native-rs/target/

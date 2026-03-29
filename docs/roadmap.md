@@ -69,8 +69,10 @@
 ## Phase 8 — Rust DS integration
 
 - [x] Prove the extracted Rust core builds for `armv5te-none-eabi`
-- [ ] Compile the Rust runtime core into the DS build
+- [x] Build a DS smoke target that links against `native-rs-core`
+- [ ] Compile the Rust runtime core into the main DS build
 - [ ] Keep ARM7 / ARM9 platform glue minimal while swapping in Rust core pieces
+- [ ] Confirm rendered output from the Rust-core smoke target in emulator/hardware
 - [ ] Boot the Rust-backed native runtime in emulator
 - [ ] Validate on hardware once the emulator path is stable
 

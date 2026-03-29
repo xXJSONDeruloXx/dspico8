@@ -96,6 +96,7 @@ Current rule of thumb:
 
 - [x] extract a `no_std`-friendly core crate (`native-rs-core/`)
 - [x] prove that core crate builds for `armv5te-none-eabi`
+- [x] build a DS smoke target that links against that Rust core
 - compile more of the Rust runtime as a static library for the DS build
 - keep ARM7 / ARM9 shell minimal at first
 - prove frame loop, cart loading, and rendering on emulator / hardware

@@ -135,6 +135,18 @@ Output:
 platform/nds/DSPICO8.nds
 ```
 
+Build the Rust-core DS smoke artifact:
+
+```bash
+make nds-rust-core-smoke
+```
+
+Output:
+
+```text
+platform/nds-rust-core/DSPICO8-RUST-CORE.nds
+```
+
 ### Docker build
 
 ```bash
@@ -142,6 +154,12 @@ platform/nds/DSPICO8.nds
 ```
 
 This expects a running Docker daemon and uses the `devkitpro/devkitarm` image.
+
+It now emits three DS artifacts under `artifacts/`:
+
+- `DSPICO8.nds`
+- `DSPICO8-FAKE08-BASELINE.nds`
+- `DSPICO8-RUST-CORE.nds`
 
 ### Rust probes
 
@@ -192,7 +210,7 @@ On the current included carts, the Rust prototype is the fastest of the three on
 
 For three shared subset carts, the Rust and C++ runtimes currently produce identical framebuffer hashes after the same number of steps.
 
-The extracted `native-rs-core/` crate also now builds for `armv5te-none-eabi`, which is a useful DS-readiness milestone even though the full Rust runtime is not yet cross-building.
+The extracted `native-rs-core/` crate also now builds for `armv5te-none-eabi`, and a local DS smoke target now links that Rust core into `platform/nds-rust-core/DSPICO8-RUST-CORE.nds`. That is a useful DS-readiness milestone even though the full Rust runtime is not yet cross-building.
 
 See `docs/benchmarks.md` and `docs/framehashes.md` for the raw numbers.
 
