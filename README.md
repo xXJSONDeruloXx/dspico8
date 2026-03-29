@@ -38,6 +38,7 @@ Current Rust work focuses on:
 - safe `.p8` cart parsing
 - safe `.p8.png` cart parsing
 - safe framebuffer / sprite / map core primitives
+- a minimal Lua bridge for desktop benchmarking
 - probes for investigating user-supplied official `pico8.dat`
 
 This is the preferred landing zone for new clean-runtime foundation work while the C++ native runtime remains the current DS reference implementation.
@@ -127,6 +128,12 @@ Inspect carts with the Rust loader:
 
 ```bash
 cargo run --manifest-path native-rs/Cargo.toml --bin cart_probe -- test/carts/cartparsetest.p8.png
+```
+
+Run the Rust prototype benchmark runtime:
+
+```bash
+cargo run --release --manifest-path native-rs/Cargo.toml --bin benchmark_native_rs -- bench/carts/fillrate.p8
 ```
 
 Inspect a user-supplied official `pico8.dat`:

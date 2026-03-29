@@ -57,10 +57,10 @@
 
 ## Phase 7 — Rust runtime execution parity
 
-- [ ] Add a minimal Lua bridge with tightly contained unsafe FFI
+- [x] Add a minimal Lua bridge with tightly contained unsafe FFI
 - [ ] Reach parity with the current clean C++ runtime subset
-- [ ] Add benchmarkable Rust runtime stepping on desktop
-- [ ] Compare Rust runtime performance against the current C++ clean runtime
+- [x] Add benchmarkable Rust runtime stepping on desktop
+- [x] Compare Rust runtime performance against the current C++ clean runtime
 
 ## Phase 8 — Rust DS integration
 

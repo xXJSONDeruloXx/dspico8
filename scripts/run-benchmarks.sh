@@ -57,6 +57,7 @@ RESULTS_FILE="$BENCH_DIR/results.txt"
 for cart in "${CARTS[@]}"; do
   "$FAKE_DIR/benchmark_fake08" "$cart" 120 600 | tee -a "$RESULTS_FILE"
   "$NATIVE_DIR/benchmark_native" "$cart" 120 600 | tee -a "$RESULTS_FILE"
+  cargo run --release --manifest-path "$ROOT_DIR/native-rs/Cargo.toml" --bin benchmark_native_rs -- "$cart" 120 600 | tee -a "$RESULTS_FILE"
 done
 
 python3 - <<'PY' "$RESULTS_FILE" "$ROOT_DIR/docs/benchmarks.md"
@@ -82,26 +83,30 @@ for e in entries:
 lines = [
     '# Benchmarks',
     '',
-    'Desktop microbenchmarks comparing the FAKE-08-derived baseline against the new clean native runtime.',
+    'Desktop microbenchmarks comparing the FAKE-08-derived baseline, the current clean C++ runtime, and the new Rust prototype runtime.',
     '',
-    '| Cart | Fake08 us/frame | Native us/frame | Faster runtime | Speedup |',
-    '| --- | ---: | ---: | --- | ---: |',
+    '| Cart | Fake08 us/frame | Native C++ us/frame | Native Rust us/frame | Fastest runtime | Rust vs C++ |',
+    '| --- | ---: | ---: | ---: | --- | ---: |',
 ]
 
 for cart, runtimes in sorted(by_cart.items()):
     fake = runtimes.get('fake08')
     native = runtimes.get('native')
-    if not fake or not native:
+    native_rs = runtimes.get('native-rs')
+    if not fake or not native or not native_rs:
         continue
     fake_us = float(fake['us_per_frame'])
     native_us = float(native['us_per_frame'])
-    if fake_us <= native_us:
-        faster = 'fake08'
-        speedup = native_us / fake_us if fake_us else 0.0
-    else:
-        faster = 'native'
-        speedup = fake_us / native_us if native_us else 0.0
-    lines.append(f'| `{Path(cart).name}` | {fake_us:.2f} | {native_us:.2f} | {faster} | {speedup:.2f}x |')
+    native_rs_us = float(native_rs['us_per_frame'])
+
+    fastest_runtime, fastest_us = min(
+        [('fake08', fake_us), ('native', native_us), ('native-rs', native_rs_us)],
+        key=lambda item: item[1],
+    )
+    rust_vs_cpp = native_us / native_rs_us if native_rs_us else 0.0
+    lines.append(
+        f'| `{Path(cart).name}` | {fake_us:.2f} | {native_us:.2f} | {native_rs_us:.2f} | {fastest_runtime} | {rust_vs_cpp:.2f}x |'
+    )
 
 lines += [
     '',
@@ -111,7 +116,10 @@ lines += [
     '- `melonDS` successfully opens both `.nds` files for quick smoke testing',
     '- current observation:',
     '  - FAKE-08-derived baseline reaches its startup text in `melonDS` (`FAT init failed.` with the current emulator filesystem config)',
-    '  - the new native runtime currently boots to a black screen in `melonDS`, so desktop benchmark numbers are the current source of truth for performance comparisons while DS-emulator bring-up continues',
+    '  - the new native runtime currently boots to a black screen in `melonDS`, so desktop benchmark numbers remain the current source of truth for performance comparisons while DS-emulator bring-up continues',
+    '- Rust status:',
+    '  - the Rust runtime is currently a desktop prototype with a minimal Lua bridge and safe Rust core primitives',
+    '  - it is not yet wired into the DS build, but it is now benchmarkable on desktop against the existing C++ runtime',
     '',
     '## Raw output',
     '',

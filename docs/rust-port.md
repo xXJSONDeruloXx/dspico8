@@ -62,6 +62,7 @@ Rust is acceptable only if it stays competitive.
 Current rule of thumb:
 
 - target within ~5–10% of the current clean C++ runtime on shared microbenchmarks
+- current desktop prototype results are better than that bar on the included stress carts, but DS integration is still pending
 - if Rust is slower in a hotspot, optimize that hotspot before widening scope
 - use tiny localized `unsafe` only when measurement justifies it
 
@@ -77,7 +78,7 @@ Current rule of thumb:
 
 ### Phase 2 — execution bridge
 
-- minimal Lua bridge in Rust
+- [x] minimal Lua bridge in Rust exists for desktop benchmarking
 - keep unsafe contained to the binding layer
 - reuse the current API subset as the initial parity target
 

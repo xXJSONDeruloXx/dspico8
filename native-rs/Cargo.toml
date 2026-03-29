@@ -16,5 +16,12 @@ path = "src/bin/cart_probe.rs"
 name = "pico8_dat_probe"
 path = "src/bin/pico8_dat_probe.rs"
 
+[[bin]]
+name = "benchmark_native_rs"
+path = "src/bin/benchmark_native_rs.rs"
+
 [dependencies]
 png = "0.18"
+
+[build-dependencies]
+cc = "1.2"
