@@ -1,0 +1,10 @@
+# build outputs
+platform/nds/*.nds
+platform/nds/arm7/build/
+platform/nds/arm9/build/
+test/build/
+*.elf
+*.map
+
+# macOS
+.DS_Store
