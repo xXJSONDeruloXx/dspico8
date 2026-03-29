@@ -66,6 +66,7 @@
 - [x] Compare Rust runtime performance against the current C++ clean runtime
 - [x] Prove identical framebuffer output on shared subset carts for at least the current benchmark pair
 - [x] Add a C++ host wrapper that can drive the Rust runtime through the C ABI using the existing `dsp::native::Cart` representation
+- [x] Converge the high-level cart-loading interface across the C++ and Rust-backed runtimes so callers can move over with less branch-specific glue
 
 ## Phase 8 — Rust DS integration
 

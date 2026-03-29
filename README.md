@@ -41,11 +41,12 @@ Current Rust work focuses on:
 - a minimal Lua bridge for desktop benchmarking
 - desktop-subset API coverage including `btn`, `btnp`, `fget`, `fset`, and `rnd`
 - a C ABI so host code can call the Rust runtime directly
-- a thin C++ wrapper so existing host-side code can swap onto the Rust runtime with the same `LoadCart` / `Step` / `FrameBuffer` shape
+- a thin C++ wrapper so existing host-side code can swap onto the Rust runtime with the same `LoadCartFromPath` / `LoadCartFromSource` / `Step` / `FrameBuffer` shape
 - direct Rust cart loading from path/source in that wrapper path, so host-side Rust-wrapper builds do not need the C++ cart parser
 - probes for investigating user-supplied official `pico8.dat`
 
 This is the preferred landing zone for new clean-runtime foundation work while the C++ native runtime remains the current DS reference implementation.
+The host-side runtime interface is now intentionally converging between the C++ and Rust-backed implementations to make future call-site swaps more mechanical.
 
 ## Why this split exists
 

@@ -20,6 +20,8 @@ public:
     Runtime& operator=(const Runtime&) = delete;
 
     bool LoadCart(const Cart& cart, std::string& error);
+    bool LoadCartFromPath(const std::string& path, std::string& error);
+    bool LoadCartFromSource(const std::string& name, const std::string& source, std::string& error);
     bool Step(const InputState& input, double timeSeconds, std::string& error);
 
     const uint8_t* FrameBuffer() const { return frameBuffer_.data(); }

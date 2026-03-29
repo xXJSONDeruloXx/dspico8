@@ -424,6 +424,22 @@ bool Runtime::CallIfExists(const char* functionName, std::string& error) {
     return true;
 }
 
+bool Runtime::LoadCartFromPath(const std::string& path, std::string& error) {
+    Cart cart;
+    if (!LoadCartFromP8File(path, cart, error)) {
+        return false;
+    }
+    return LoadCart(cart, error);
+}
+
+bool Runtime::LoadCartFromSource(const std::string& name, const std::string& source, std::string& error) {
+    Cart cart;
+    if (!LoadCartFromP8String(name, source, cart, error)) {
+        return false;
+    }
+    return LoadCart(cart, error);
+}
+
 bool Runtime::LoadCart(const Cart& cart, std::string& error) {
     ResetLua();
     ResetDrawState();

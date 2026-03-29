@@ -4,9 +4,9 @@ Desktop microbenchmarks comparing the FAKE-08-derived baseline, the current clea
 
 | Cart | Fake08 us/frame | Native C++ us/frame | Rust via C++ host us/frame | Native Rust us/frame | Fastest runtime | C++ host overhead vs Rust |
 | --- | ---: | ---: | ---: | ---: | --- | ---: |
-| `api_mix.p8` | 31.68 | 13.44 | 6.48 | 6.30 | native-rs | 1.03x |
-| `fillrate.p8` | 126.14 | 83.70 | 42.05 | 42.73 | native-rs-cpp | 0.98x |
-| `sprite_stress.p8` | 219.73 | 67.11 | 42.81 | 44.07 | native-rs-cpp | 0.97x |
+| `api_mix.p8` | 31.60 | 12.86 | 6.64 | 6.39 | native-rs | 1.04x |
+| `fillrate.p8` | 127.11 | 83.85 | 41.15 | 41.04 | native-rs | 1.00x |
+| `sprite_stress.p8` | 217.29 | 66.89 | 42.21 | 42.20 | native-rs | 1.00x |
 
 ## Validation notes
 
@@ -19,16 +19,16 @@ Desktop microbenchmarks comparing the FAKE-08-derived baseline, the current clea
 ## Raw output
 
 ```text
-runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=126.14 fps_equivalent=7927.39
-runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=83.70 fps_equivalent=11946.72
-runtime=native-rs-cpp cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=42.05 fps_equivalent=23781.21
-runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=42.73 fps_equivalent=23401.85
-runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=219.73 fps_equivalent=4550.97
-runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=67.11 fps_equivalent=14901.28
-runtime=native-rs-cpp cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=42.81 fps_equivalent=23360.85
-runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=44.07 fps_equivalent=22691.17
-runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=31.68 fps_equivalent=31560.68
-runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=13.44 fps_equivalent=74404.76
-runtime=native-rs-cpp cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=6.48 fps_equivalent=154241.65
-runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=6.30 fps_equivalent=158688.18
+runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=127.11 fps_equivalent=7867.51
+runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=83.85 fps_equivalent=11925.82
+runtime=native-rs-cpp cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=41.15 fps_equivalent=24300.35
+runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/fillrate.p8 frames=600 us_per_frame=41.04 fps_equivalent=24366.47
+runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=217.29 fps_equivalent=4602.07
+runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=66.89 fps_equivalent=14950.66
+runtime=native-rs-cpp cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=42.21 fps_equivalent=23692.00
+runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/sprite_stress.p8 frames=600 us_per_frame=42.20 fps_equivalent=23699.49
+runtime=fake08 cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=31.60 fps_equivalent=31648.91
+runtime=native cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=12.86 fps_equivalent=77780.66
+runtime=native-rs-cpp cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=6.64 fps_equivalent=150489.09
+runtime=native-rs cart=/Users/danhimebauch/Developer/dspico8/bench/carts/api_mix.p8 frames=600 us_per_frame=6.39 fps_equivalent=156453.72
 ```

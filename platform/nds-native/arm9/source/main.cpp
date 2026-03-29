@@ -27,7 +27,6 @@ using dsp::native::InputState;
 using dsp::native::RuntimeRs;
 using Runtime = RuntimeRs;
 #else
-using dsp::native::Cart;
 using dsp::native::Runtime;
 #endif
 
@@ -120,27 +119,11 @@ bool LoadStartupRuntime(Runtime& runtime, std::string& loadedName, std::string& 
     auto carts = ListP8Carts("/p8carts");
     if (!carts.empty()) {
         loadedName = carts.front();
-#if defined(DSP_NATIVE_USE_RUST_WRAPPER)
         return runtime.LoadCartFromPath(loadedName, error);
-#else
-        Cart cart;
-        if (!dsp::native::LoadCartFromP8File(loadedName, cart, error)) {
-            return false;
-        }
-        return runtime.LoadCart(cart, error);
-#endif
     }
 
     loadedName = "builtin:fillrate";
-#if defined(DSP_NATIVE_USE_RUST_WRAPPER)
     return runtime.LoadCartFromSource(loadedName, dsp::native::kBuiltinBenchmarkCart, error);
-#else
-    Cart cart;
-    if (!dsp::native::LoadCartFromP8String(loadedName, dsp::native::kBuiltinBenchmarkCart, cart, error)) {
-        return false;
-    }
-    return runtime.LoadCart(cart, error);
-#endif
 }
 
 } // namespace

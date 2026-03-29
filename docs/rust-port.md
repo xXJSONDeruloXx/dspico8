@@ -92,6 +92,7 @@ Current rule of thumb:
 - [x] expose a C ABI that lets a C++ host feed an existing `dsp::native::Cart` into the Rust runtime
 - [x] add a C++ wrapper so host-side code can swap from the clean C++ runtime to the Rust runtime with the same high-level call pattern (`LoadCart` / `Step` / `FrameBuffer`)
 - [x] allow that wrapper path to load carts directly from path/source through Rust, so wrapper builds no longer depend on the C++ cart parser
+- [x] converge the high-level runtime-loading interface between the C++ and Rust-backed runtimes so more callers can target `LoadCartFromPath` / `LoadCartFromSource` without caring which implementation sits underneath
 - keep widening benchmark coverage with carts that exercise more of the implemented API subset
 - compare framebuffer hashes on shared carts so performance wins are paired with correctness checks
 
