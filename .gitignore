@@ -3,6 +3,7 @@ platform/nds/*.nds
 platform/nds/arm7/build/
 platform/nds/arm9/build/
 test/build/
+test/testrunner.a
 *.elf
 *.map
 

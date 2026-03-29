@@ -1,0 +1,54 @@
+name: dspico8
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  tests:
+    name: Desktop tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Run tests
+        run: make tests
+
+  nds:
+    name: Build Nintendo DS artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build .nds with Docker
+        run: ./scripts/build-nds-docker.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dspico8-nds
+          path: platform/nds/DSPICO8.nds
+
+      - name: Publish prerelease
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            platform/nds/DSPICO8.nds
