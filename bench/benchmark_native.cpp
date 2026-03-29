@@ -1,5 +1,14 @@
 #include "dsp_native_cart.h"
+
+#if defined(DSP_NATIVE_USE_RUST_WRAPPER)
+#include "dsp_native_runtime_rs.h"
+using NativeRuntime = dsp::native::RuntimeRs;
+static constexpr const char* kRuntimeLabel = "native-rs-cpp";
+#else
 #include "dsp_native_runtime.h"
+using NativeRuntime = dsp::native::Runtime;
+static constexpr const char* kRuntimeLabel = "native";
+#endif
 
 #include <chrono>
 #include <cstdlib>
@@ -19,7 +28,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    dsp::native::Runtime runtime;
+    NativeRuntime runtime;
     if (!runtime.LoadCart(cart, error)) {
         std::cerr << error << "\n";
         return 2;
@@ -46,7 +55,7 @@ int main(int argc, char** argv) {
     const double fps = 1000000.0 / microsPerFrame;
 
     std::cout << std::fixed << std::setprecision(2)
-              << "runtime=native"
+              << "runtime=" << kRuntimeLabel
               << " cart=" << cartPath
               << " frames=" << measuredFrames
               << " us_per_frame=" << microsPerFrame

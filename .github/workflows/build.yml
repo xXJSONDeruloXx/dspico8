@@ -33,6 +33,9 @@ jobs:
       - name: Run Rust desktop tests
         run: make rust-tests
 
+      - name: Run Rust/C++ host FFI smoke
+        run: make rust-ffi-smoke
+
       - name: Check Rust core bare-metal ARM build
         run: make rust-core-arm-check
 

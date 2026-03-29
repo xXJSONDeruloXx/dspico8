@@ -89,6 +89,8 @@ Current rule of thumb:
 - run desktop tests for Rust modules
 - add desktop microbenchmarks for Rust runtime pieces
 - compare against the current C++ clean runtime and FAKE-08 baseline
+- [x] expose a C ABI that lets a C++ host feed an existing `dsp::native::Cart` into the Rust runtime
+- [x] add a C++ wrapper so host-side code can swap from the clean C++ runtime to the Rust runtime with the same high-level call pattern (`LoadCart` / `Step` / `FrameBuffer`)
 - keep widening benchmark coverage with carts that exercise more of the implemented API subset
 - compare framebuffer hashes on shared carts so performance wins are paired with correctness checks
 
@@ -120,4 +122,5 @@ For now:
 
 - `native/` remains the working C++ reference runtime
 - `native-rs/` becomes the preferred destination for new clean-runtime work
+- host-side callers can now target the Rust runtime through a thin C++ wrapper without adopting Rust directly
 - avoid large new C++ compatibility features unless they are strictly needed to unblock the Rust path

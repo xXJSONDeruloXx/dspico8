@@ -6,6 +6,8 @@ HASH_DIR="$ROOT_DIR/.framehash"
 NATIVE_DIR="$HASH_DIR/native"
 mkdir -p "$NATIVE_DIR"
 
+cargo build --release --manifest-path "$ROOT_DIR/native-rs/Cargo.toml"
+
 cc -std=c99 -DMAKE_LIB -I"$ROOT_DIR/third_party/lua" -c "$ROOT_DIR/third_party/lua/onelua.c" -o "$NATIVE_DIR/onelua.o"
 c++ -O3 -std=c++17 \
   -I"$ROOT_DIR/native/include" \
@@ -17,6 +19,16 @@ c++ -O3 -std=c++17 \
   -lm -ldl \
   -o "$NATIVE_DIR/framehash_native"
 
+c++ -O3 -std=c++17 -DDSP_NATIVE_USE_RUST_WRAPPER \
+  -I"$ROOT_DIR/native/include" \
+  -I"$ROOT_DIR/native-rs/include" \
+  "$ROOT_DIR/bench/framehash_native.cpp" \
+  "$ROOT_DIR/native/src/dsp_native_cart.cpp" \
+  "$ROOT_DIR/native/src/dsp_native_runtime_rs.cpp" \
+  "$ROOT_DIR/native-rs/target/release/libdsp_native_rs.a" \
+  -ldl -lm -lpthread \
+  -o "$NATIVE_DIR/framehash_native_rs_cpp"
+
 CARTS=(
   "$ROOT_DIR/bench/carts/fillrate.p8"
   "$ROOT_DIR/bench/carts/sprite_stress.p8"
@@ -27,6 +39,7 @@ RESULTS_FILE="$HASH_DIR/results.txt"
 : > "$RESULTS_FILE"
 for cart in "${CARTS[@]}"; do
   "$NATIVE_DIR/framehash_native" "$cart" 120 | tee -a "$RESULTS_FILE"
+  "$NATIVE_DIR/framehash_native_rs_cpp" "$cart" 120 | tee -a "$RESULTS_FILE"
   cargo run --release --manifest-path "$ROOT_DIR/native-rs/Cargo.toml" --bin frame_hash_native_rs -- "$cart" 120 | tee -a "$RESULTS_FILE"
 done
 
@@ -53,20 +66,21 @@ for e in entries:
 lines = [
     '# Framebuffer hash comparisons',
     '',
-    'Framebuffer FNV-1a hashes comparing the current clean C++ runtime against the Rust runtime on shared subset carts.',
+    'Framebuffer FNV-1a hashes comparing the current clean C++ runtime, the Rust runtime called through a C++ host wrapper, and the Rust runtime called directly from Rust on shared subset carts.',
     '',
-    '| Cart | Native C++ hash | Native Rust hash | Match |',
-    '| --- | --- | --- | --- |',
+    '| Cart | Native C++ hash | Rust via C++ host hash | Native Rust hash | All match |',
+    '| --- | --- | --- | --- | --- |',
 ]
 
 for cart, runtimes in sorted(by_cart.items()):
     native = runtimes.get('native-hash')
+    rust_cpp = runtimes.get('native-rs-cpp-hash')
     rust = runtimes.get('native-rs-hash')
-    if not native or not rust:
+    if not native or not rust_cpp or not rust:
         continue
-    match = 'yes' if native['fnv64'] == rust['fnv64'] else 'no'
+    match = 'yes' if native['fnv64'] == rust_cpp['fnv64'] == rust['fnv64'] else 'no'
     lines.append(
-        f"| `{Path(cart).name}` | `{native['fnv64']}` | `{rust['fnv64']}` | {match} |"
+        f"| `{Path(cart).name}` | `{native['fnv64']}` | `{rust_cpp['fnv64']}` | `{rust['fnv64']}` | {match} |"
     )
 
 lines += [

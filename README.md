@@ -41,6 +41,7 @@ Current Rust work focuses on:
 - a minimal Lua bridge for desktop benchmarking
 - desktop-subset API coverage including `btn`, `btnp`, `fget`, `fset`, and `rnd`
 - a C ABI so host code can call the Rust runtime directly
+- a thin C++ wrapper so existing host-side code can swap onto the Rust runtime with the same `LoadCart` / `Step` / `FrameBuffer` shape
 - probes for investigating user-supplied official `pico8.dat`
 
 This is the preferred landing zone for new clean-runtime foundation work while the C++ native runtime remains the current DS reference implementation.
@@ -93,13 +94,13 @@ Run benchmark comparisons:
 make benchmarks
 ```
 
-Run framebuffer-hash comparisons between the current C++ runtime and Rust runtime on shared carts:
+Run framebuffer-hash comparisons between the current C++ runtime, the Rust runtime, and the Rust runtime driven through the C++ host wrapper on shared carts:
 
 ```bash
 make framehashes
 ```
 
-Smoke-test the Rust C ABI from a C++ host:
+Smoke-test the Rust C ABI from both a direct C++ caller and the new C++ host wrapper path:
 
 ```bash
 make rust-ffi-smoke
