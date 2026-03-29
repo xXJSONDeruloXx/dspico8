@@ -22,8 +22,16 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Run tests
+      - name: Run C++ desktop tests
         run: make tests
+
+      - name: Install Rust toolchain
+        run: |
+          curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Run Rust desktop tests
+        run: make rust-tests
 
   nds:
     name: Build Nintendo DS artifacts

@@ -6,7 +6,7 @@ export V_PATCH    := 0
 export V_BUILD    := 0
 export APP_VERSION := v$(V_MAJOR).$(V_MINOR).$(V_PATCH)
 
-.PHONY: all nds nds-baseline tests benchmarks clean clean-nds clean-tests
+.PHONY: all nds nds-baseline tests rust-tests benchmarks clean clean-nds clean-tests clean-rust
 
 all: nds
 
@@ -20,10 +20,13 @@ tests:
 	@$(MAKE) -C test
 	cd test && ./testrunner.a
 
+rust-tests:
+	cargo test --manifest-path native-rs/Cargo.toml
+
 benchmarks:
 	./scripts/run-benchmarks.sh
 
-clean: clean-nds clean-tests
+clean: clean-nds clean-tests clean-rust
 
 clean-nds:
 	@$(MAKE) -C platform/nds-native clean
@@ -31,3 +34,6 @@ clean-nds:
 
 clean-tests:
 	@$(MAKE) -C test clean
+
+clean-rust:
+	rm -rf native-rs/target

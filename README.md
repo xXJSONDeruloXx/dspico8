@@ -29,6 +29,19 @@ This runtime is intentionally early and currently focuses on:
 
 `make nds-baseline` still builds the FAKE-08-derived DS port for comparison and benchmarking.
 
+### Rust foundations
+
+A new Rust-first track now lives in `native-rs/`.
+
+Current Rust work focuses on:
+
+- safe `.p8` cart parsing
+- safe `.p8.png` cart parsing
+- safe framebuffer / sprite / map core primitives
+- probes for investigating user-supplied official `pico8.dat`
+
+This is the preferred landing zone for new clean-runtime foundation work while the C++ native runtime remains the current DS reference implementation.
+
 ## Why this split exists
 
 You asked for a native implementation that is **not FAKE-08**.
@@ -46,6 +59,8 @@ This lets us measure speed and behavior against the previous implementation whil
 - `docs/architecture.md`
 - `docs/roadmap.md`
 - `docs/benchmarks.md`
+- `docs/rust-port.md`
+- `docs/official-pico8-investigation.md`
 
 ## Build
 
@@ -60,6 +75,12 @@ Run regression tests for the baseline runtime:
 
 ```bash
 make tests
+```
+
+Run Rust foundation tests:
+
+```bash
+make rust-tests
 ```
 
 Run benchmark comparisons:
@@ -99,6 +120,20 @@ platform/nds/DSPICO8.nds
 ```
 
 This expects a running Docker daemon and uses the `devkitpro/devkitarm` image.
+
+### Rust probes
+
+Inspect carts with the Rust loader:
+
+```bash
+cargo run --manifest-path native-rs/Cargo.toml --bin cart_probe -- test/carts/cartparsetest.p8.png
+```
+
+Inspect a user-supplied official `pico8.dat`:
+
+```bash
+cargo run --manifest-path native-rs/Cargo.toml --bin pico8_dat_probe -- /path/to/pico8.dat
+```
 
 ## Running on hardware
 

@@ -9,6 +9,7 @@ platform/nds-native/arm7/build/
 platform/nds-native/arm9/build/
 test/build/
 test/testrunner.a
+native-rs/target/
 *.elf
 *.map
 
