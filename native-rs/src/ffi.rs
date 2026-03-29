@@ -1,4 +1,4 @@
-use crate::{load_cart_from_path, InputState, LuaRuntime};
+use crate::{load_cart_from_path, load_cart_from_source, InputState, LuaRuntime};
 
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -98,6 +98,55 @@ pub extern "C" fn dsp_rs_runtime_load_cart_from_path(
     };
 
     match load_cart_from_path(path_str) {
+        Ok(cart) => match handle.runtime.load_cart(&cart) {
+            Ok(()) => {
+                handle.clear_error();
+                true
+            }
+            Err(error) => {
+                handle.set_error(error);
+                false
+            }
+        },
+        Err(error) => {
+            handle.set_error(error);
+            false
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_rs_runtime_load_cart_from_source(
+    handle: *mut dsp_rs_runtime_handle,
+    name: *const c_char,
+    source: *const c_char,
+) -> bool {
+    if handle.is_null() || source.is_null() {
+        return false;
+    }
+
+    let handle = unsafe { &mut *handle };
+    let cart_name = match if name.is_null() {
+        Ok(String::from("ffi-source"))
+    } else {
+        read_c_string(name, "cart name")
+    } {
+        Ok(name) => name,
+        Err(error) => {
+            handle.set_error(error);
+            return false;
+        }
+    };
+
+    let source = match read_c_string(source, "cart source") {
+        Ok(source) => source,
+        Err(error) => {
+            handle.set_error(error);
+            return false;
+        }
+    };
+
+    match load_cart_from_source(&cart_name, &source) {
         Ok(cart) => match handle.runtime.load_cart(&cart) {
             Ok(()) => {
                 handle.clear_error();

@@ -23,7 +23,6 @@ c++ -O3 -std=c++17 -DDSP_NATIVE_USE_RUST_WRAPPER \
   -I"$ROOT_DIR/native/include" \
   -I"$ROOT_DIR/native-rs/include" \
   "$ROOT_DIR/bench/framehash_native.cpp" \
-  "$ROOT_DIR/native/src/dsp_native_cart.cpp" \
   "$ROOT_DIR/native/src/dsp_native_runtime_rs.cpp" \
   "$ROOT_DIR/native-rs/target/release/libdsp_native_rs.a" \
   -ldl -lm -lpthread \

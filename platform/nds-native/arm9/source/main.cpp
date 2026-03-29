@@ -14,13 +14,22 @@
 #include <vector>
 
 #include "dsp_native_builtin_carts.h"
+#if defined(DSP_NATIVE_USE_RUST_WRAPPER)
+#include "dsp_native_runtime_rs.h"
+#else
 #include "dsp_native_cart.h"
 #include "dsp_native_runtime.h"
+#endif
 
 namespace {
-using dsp::native::Cart;
 using dsp::native::InputState;
+#if defined(DSP_NATIVE_USE_RUST_WRAPPER)
+using dsp::native::RuntimeRs;
+using Runtime = RuntimeRs;
+#else
+using dsp::native::Cart;
 using dsp::native::Runtime;
+#endif
 
 constexpr int kFrameBytes = dsp::native::kScreenWidth * dsp::native::kScreenHeight;
 
@@ -107,15 +116,31 @@ bool QuitRequested() {
     return (held & (KEY_L | KEY_R)) == (KEY_L | KEY_R);
 }
 
-bool LoadStartupCart(Cart& cart, std::string& loadedName, std::string& error) {
+bool LoadStartupRuntime(Runtime& runtime, std::string& loadedName, std::string& error) {
     auto carts = ListP8Carts("/p8carts");
     if (!carts.empty()) {
         loadedName = carts.front();
-        return dsp::native::LoadCartFromP8File(loadedName, cart, error);
+#if defined(DSP_NATIVE_USE_RUST_WRAPPER)
+        return runtime.LoadCartFromPath(loadedName, error);
+#else
+        Cart cart;
+        if (!dsp::native::LoadCartFromP8File(loadedName, cart, error)) {
+            return false;
+        }
+        return runtime.LoadCart(cart, error);
+#endif
     }
 
     loadedName = "builtin:fillrate";
-    return dsp::native::LoadCartFromP8String(loadedName, dsp::native::kBuiltinBenchmarkCart, cart, error);
+#if defined(DSP_NATIVE_USE_RUST_WRAPPER)
+    return runtime.LoadCartFromSource(loadedName, dsp::native::kBuiltinBenchmarkCart, error);
+#else
+    Cart cart;
+    if (!dsp::native::LoadCartFromP8String(loadedName, dsp::native::kBuiltinBenchmarkCart, cart, error)) {
+        return false;
+    }
+    return runtime.LoadCart(cart, error);
+#endif
 }
 
 } // namespace
@@ -136,21 +161,11 @@ int main(int argc, char** argv) {
         iprintf("fat unavailable, using builtin cart\n");
     }
 
-    Cart cart;
     std::string error;
     std::string loadedName;
-    iprintf("loading cart...\n");
-    if (!LoadStartupCart(cart, loadedName, error)) {
-        iprintf("cart load failed:\n%s\n", error.c_str());
-        while (true) {
-            swiWaitForVBlank();
-        }
-    }
-
-    iprintf("cart parsed ok\n");
     Runtime runtime;
-    iprintf("loading lua...\n");
-    if (!runtime.LoadCart(cart, error)) {
+    iprintf("loading cart...\n");
+    if (!LoadStartupRuntime(runtime, loadedName, error)) {
         iprintf("runtime load failed:\n%s\n", error.c_str());
         while (true) {
             swiWaitForVBlank();

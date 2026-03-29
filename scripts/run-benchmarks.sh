@@ -28,7 +28,6 @@ c++ -O3 -std=c++17 -DDSP_NATIVE_USE_RUST_WRAPPER \
   -I"$ROOT_DIR/native/include" \
   -I"$ROOT_DIR/native-rs/include" \
   "$ROOT_DIR/bench/benchmark_native.cpp" \
-  "$ROOT_DIR/native/src/dsp_native_cart.cpp" \
   "$ROOT_DIR/native/src/dsp_native_runtime_rs.cpp" \
   "$ROOT_DIR/native-rs/target/release/libdsp_native_rs.a" \
   -ldl -lm -lpthread \
@@ -131,7 +130,7 @@ lines += [
     '- desktop benchmarks remain the current source of truth for runtime-performance comparisons',
     '- Rust status:',
     '  - the Rust runtime is currently a desktop prototype with a minimal Lua bridge and safe Rust core primitives',
-    '  - the host-side migration path now includes a C++ wrapper that can drive the Rust runtime through the C ABI using the existing `dsp::native::Cart` representation',
+    '  - the host-side migration path now includes a C++ wrapper that can drive the Rust runtime through the C ABI using either the existing `dsp::native::Cart` representation or direct Rust cart loading from path/source',
     '  - it is not yet wired into the main DS runtime build, but it is now benchmarkable on desktop both directly from Rust and through a C++ host caller',
     '',
     '## Raw output',

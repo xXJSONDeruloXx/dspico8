@@ -42,6 +42,7 @@ Current Rust work focuses on:
 - desktop-subset API coverage including `btn`, `btnp`, `fget`, `fset`, and `rnd`
 - a C ABI so host code can call the Rust runtime directly
 - a thin C++ wrapper so existing host-side code can swap onto the Rust runtime with the same `LoadCart` / `Step` / `FrameBuffer` shape
+- direct Rust cart loading from path/source in that wrapper path, so host-side Rust-wrapper builds do not need the C++ cart parser
 - probes for investigating user-supplied official `pico8.dat`
 
 This is the preferred landing zone for new clean-runtime foundation work while the C++ native runtime remains the current DS reference implementation.
@@ -100,7 +101,7 @@ Run framebuffer-hash comparisons between the current C++ runtime, the Rust runti
 make framehashes
 ```
 
-Smoke-test the Rust C ABI from both a direct C++ caller and the new C++ host wrapper path:
+Smoke-test the Rust C ABI from both a direct C++ caller and the new C++ host wrapper path, including builtin cart source loading through the wrapper:
 
 ```bash
 make rust-ffi-smoke

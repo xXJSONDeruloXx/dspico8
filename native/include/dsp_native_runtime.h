@@ -11,11 +11,6 @@ struct lua_State;
 
 namespace dsp::native {
 
-struct InputState {
-    uint8_t down = 0;
-    uint8_t held = 0;
-};
-
 class Runtime {
 public:
     Runtime();

@@ -54,6 +54,20 @@ bool RuntimeRs::LoadCartFromPath(const std::string& path, std::string& error) {
     return true;
 }
 
+bool RuntimeRs::LoadCartFromSource(const std::string& name, const std::string& source, std::string& error) {
+    if (handle_ == nullptr) {
+        error = "failed to create rust runtime handle";
+        return false;
+    }
+
+    if (!dsp_rs_runtime_load_cart_from_source(handle_, name.c_str(), source.c_str())) {
+        return SetErrorFromHandle(handle_, error);
+    }
+
+    error.clear();
+    return true;
+}
+
 bool RuntimeRs::Step(const InputState& input, double timeSeconds, std::string& error) {
     if (handle_ == nullptr) {
         error = "failed to create rust runtime handle";

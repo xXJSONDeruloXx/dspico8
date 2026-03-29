@@ -91,6 +91,7 @@ Current rule of thumb:
 - compare against the current C++ clean runtime and FAKE-08 baseline
 - [x] expose a C ABI that lets a C++ host feed an existing `dsp::native::Cart` into the Rust runtime
 - [x] add a C++ wrapper so host-side code can swap from the clean C++ runtime to the Rust runtime with the same high-level call pattern (`LoadCart` / `Step` / `FrameBuffer`)
+- [x] allow that wrapper path to load carts directly from path/source through Rust, so wrapper builds no longer depend on the C++ cart parser
 - keep widening benchmark coverage with carts that exercise more of the implemented API subset
 - compare framebuffer hashes on shared carts so performance wins are paired with correctness checks
 
@@ -100,6 +101,7 @@ Current rule of thumb:
 - [x] prove that core crate builds for `armv5te-none-eabi`
 - [x] build a DS smoke target that links against that Rust core
 - compile more of the Rust runtime as a static library for the DS build
+- [x] start parameterizing the DS-native entry path so cart loading/runtime bootstrap can swap to the Rust wrapper without rewriting the whole ARM9 loop
 - keep ARM7 / ARM9 shell minimal at first
 - prove frame loop, cart loading, and rendering on emulator / hardware
 

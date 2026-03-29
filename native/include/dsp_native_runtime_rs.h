@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dsp_native_runtime.h"
+#include "dsp_native_cart.h"
 #include "dsp_native_rs.h"
 
 #include <cstdint>
@@ -18,6 +18,7 @@ public:
 
     bool LoadCart(const Cart& cart, std::string& error);
     bool LoadCartFromPath(const std::string& path, std::string& error);
+    bool LoadCartFromSource(const std::string& name, const std::string& source, std::string& error);
     bool Step(const InputState& input, double timeSeconds, std::string& error);
 
     const uint8_t* FrameBuffer() const;

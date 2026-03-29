@@ -1,17 +1,12 @@
 #pragma once
 
+#include "dsp_native_common.h"
+
 #include <array>
 #include <cstdint>
 #include <string>
 
 namespace dsp::native {
-
-constexpr int kScreenWidth = 128;
-constexpr int kScreenHeight = 128;
-constexpr int kSpriteSheetWidth = 128;
-constexpr int kSpriteSheetHeight = 128;
-constexpr int kMapWidth = 128;
-constexpr int kMapHeight = 64;
 
 struct Cart {
     std::string name;
