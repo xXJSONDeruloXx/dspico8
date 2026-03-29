@@ -1,3 +1,6 @@
 [submodule "libs/z8lua"]
 	path = libs/z8lua
 	url = https://github.com/jtothebell/z8lua.git
+[submodule "third_party/lua"]
+	path = third_party/lua
+	url = https://github.com/lua/lua.git

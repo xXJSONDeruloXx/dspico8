@@ -1,22 +1,51 @@
 # dspico8
 
-A Nintendo DS-focused, native PICO-8-compatible runtime experiment.
+A Nintendo DS-focused, **clean native PICO-8 runtime experiment**.
 
-`dspico8` bootstraps from the proven FAKE-08 core, then layers a DS-native host, build pipeline, and DS-specific performance work on top.
+The repo now has two tracks:
 
-## What is in this repo
+- **native runtime**: a new clean runtime in `native/` with a DS-first 8bpp framebuffer design
+- **baseline runtime**: the earlier FAKE-08-derived bootstrap kept for comparison in `platform/nds` and the legacy source tree
 
-- a working Nintendo DS ARM7/ARM9 build
-- the FAKE-08-compatible runtime core and desktop regression tests
-- DS-specific host code built with `libnds` + `maxmod`
-- research / planning / roadmap docs in `docs/`
-- GitHub Actions for tests, `.nds` builds, and tagged prereleases
+## Current status
+
+### Native runtime
+
+`make nds` now builds the **new native runtime** from:
+
+- `native/`
+- `third_party/lua/`
+- `platform/nds-native/`
+
+This runtime is intentionally early and currently focuses on:
+
+- `.p8` text carts
+- core frame loop: `_init`, `_update` / `_update60`, `_draw`
+- a practical graphics subset: `cls`, `color`, `pset`, `pget`, `line`, `rect`, `rectfill`, `spr`, `map`, `sget`, `sset`, `mget`, `mset`, `fget`, `fset`, `camera`, `clip`
+- input: `btn`, `btnp`
+- helpers: `rnd`, `time`, `flip`, plus a few Lua helper shims
+
+### Baseline runtime
+
+`make nds-baseline` still builds the FAKE-08-derived DS port for comparison and benchmarking.
+
+## Why this split exists
+
+You asked for a native implementation that is **not FAKE-08**.
+
+So the project now keeps:
+
+- the old baseline as a benchmark / reference target
+- a new clean runtime as the main target
+
+This lets us measure speed and behavior against the previous implementation while moving the shipping artifact onto a non-FAKE-08 core.
 
 ## Docs
 
 - `docs/research.md`
 - `docs/architecture.md`
 - `docs/roadmap.md`
+- `docs/benchmarks.md`
 
 ## Build
 
@@ -27,16 +56,34 @@ git clone --recurse-submodules https://github.com/xXJSONDeruloXx/dspico8.git
 cd dspico8
 ```
 
-Run desktop regression tests:
+Run regression tests for the baseline runtime:
 
 ```bash
 make tests
 ```
 
-Build the Nintendo DS artifact with a local devkitPro install:
+Run benchmark comparisons:
+
+```bash
+make benchmarks
+```
+
+Build the new native Nintendo DS artifact:
 
 ```bash
 make nds
+```
+
+Output:
+
+```text
+platform/nds-native/DSPICO8.nds
+```
+
+Build the baseline FAKE-08-derived DS artifact:
+
+```bash
+make nds-baseline
 ```
 
 Output:
@@ -47,8 +94,6 @@ platform/nds/DSPICO8.nds
 
 ### Docker build
 
-A convenience script is included for Docker-based builds:
-
 ```bash
 ./scripts/build-nds-docker.sh
 ```
@@ -57,32 +102,34 @@ This expects a running Docker daemon and uses the `devkitpro/devkitarm` image.
 
 ## Running on hardware
 
-- copy carts into `/p8carts`
-- launch `DSPICO8.nds`
+Current native runtime behavior:
+
+- looks for `.p8` carts in `/p8carts`
+- if none are found, falls back to a built-in benchmark cart
+- game renders on the main screen
+- runtime stats print on the sub screen
+
+Controls:
+
 - D-pad = directions
 - `B` = PICO-8 `O`
 - `A` = PICO-8 `X`
-- `START` = pause/menu
-- `SELECT` = stretch/screen mode
+- `START` = `btn(6)`
 - hold `L + R` to quit
 
-## Current implementation direction
+## Benchmarks
 
-Short version:
+Current desktop microbenchmarks show the clean native runtime ahead of the FAKE-08-derived baseline on the included stress carts:
 
-- use the FAKE-08 native core as the compatibility bootstrap
-- keep the DS host thin and explicit
-- optimize DS-specific hot paths first
+- `fillrate.p8`: native faster
+- `sprite_stress.p8`: native faster
 
-The first DS-focused optimization already in this repo is a faster framebuffer upload path that expands packed PICO-8 pixels with a LUT instead of per-pixel nibble extraction.
+See `docs/benchmarks.md` for the raw numbers.
 
 ## Provenance
 
-This repo is derived from and inspired by:
+This repo still contains the earlier FAKE-08-derived baseline for comparison purposes, but the main runtime direction now centers on the clean implementation under `native/`.
 
-- `xXJSONDeruloXx/ds-fake-08` (`feat/nds-support`)
-- `jtothebell/fake-08`
-- `jtothebell/z8lua`
-- broader PICO-8 implementation references documented in `docs/research.md`
+Reference inspirations are documented in `docs/research.md`.
 
 See `LICENSE.MD` and third-party library directories for license details.

@@ -1,7 +1,12 @@
 # build outputs
+.bench/
+artifacts/
 platform/nds/*.nds
 platform/nds/arm7/build/
 platform/nds/arm9/build/
+platform/nds-native/*.nds
+platform/nds-native/arm7/build/
+platform/nds-native/arm9/build/
 test/build/
 test/testrunner.a
 *.elf

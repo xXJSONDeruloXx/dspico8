@@ -26,7 +26,7 @@ jobs:
         run: make tests
 
   nds:
-    name: Build Nintendo DS artifact
+    name: Build Nintendo DS artifacts
     runs-on: ubuntu-latest
 
     steps:
@@ -35,14 +35,16 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Build .nds with Docker
+      - name: Build native and baseline .nds artifacts with Docker
         run: ./scripts/build-nds-docker.sh
 
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dspico8-nds
-          path: platform/nds/DSPICO8.nds
+          path: |
+            artifacts/DSPICO8.nds
+            artifacts/DSPICO8-FAKE08-BASELINE.nds
 
       - name: Publish prerelease
         if: startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request'
@@ -51,4 +53,5 @@ jobs:
           prerelease: true
           generate_release_notes: true
           files: |
-            platform/nds/DSPICO8.nds
+            artifacts/DSPICO8.nds
+            artifacts/DSPICO8-FAKE08-BASELINE.nds

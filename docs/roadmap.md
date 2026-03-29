@@ -6,42 +6,56 @@
 - [x] Write research notes
 - [x] Write architecture plan
 - [x] Write roadmap
-- [ ] Create public repo and push initial docs
+- [x] Create public repo and push initial docs
 
-## Phase 1 — Bring up a real DS-native build
+## Phase 1 — Baseline DS bootstrap
 
-- [ ] Import the proven FAKE-08 native core pieces needed for DS
-- [ ] Import / wire the DS ARM7 + ARM9 platform layer
-- [ ] Keep or restore desktop regression tests
-- [ ] Build a working `.nds` locally
-- [ ] Add basic usage / build docs
+- [x] Import the proven FAKE-08-derived DS baseline for reference
+- [x] Keep desktop regression tests for the baseline runtime
+- [x] Build a working baseline `.nds` locally
+- [x] Add CI + prerelease publishing for the baseline artifact
 
-## Phase 2 — DS performance pass
+## Phase 2 — Clean native runtime track
 
-- [ ] Replace the current framebuffer upload hot path with a LUT-based expander
-- [ ] Tighten compiler flags and remove obvious slow paths in the DS build
-- [ ] Identify common renderer hotspots and specialize them
-- [ ] Validate input, audio, save data, and stretch modes after optimization
+- [x] Start a non-FAKE-08 runtime in `native/`
+- [x] Use a DS-friendly 8bpp framebuffer in the clean runtime
+- [x] Add a DS-native build target in `platform/nds-native/`
+- [x] Build a working clean-runtime `.nds` locally
+- [x] Keep the baseline build as `make nds-baseline` for comparison
 
-## Phase 3 — Reproducible automation
+## Phase 3 — Progressive performance comparison
 
-- [ ] Add Docker-backed local build script(s)
-- [ ] Add GitHub Actions for tests + `.nds` builds
-- [ ] Upload build artifacts from CI
-- [ ] Add tagged prerelease publishing
+- [x] Add repeatable desktop benchmark carts
+- [x] Add a benchmark runner comparing baseline vs native runtime
+- [x] Record current results in `docs/benchmarks.md`
+- [ ] Expand benchmark coverage to more real-world carts and API mixes
 
-## Phase 4 — Release candidate
+## Phase 4 — Emulator and hardware validation
 
-- [ ] Produce a fully built `.nds` artifact
-- [ ] Publish it as a GitHub prerelease
-- [ ] Document known limitations and next perf targets
+- [x] Install macOS DS emulators for smoke testing
+- [x] Smoke test baseline and native artifacts in `melonDS`
+- [ ] Fix the current native-runtime black-screen issue observed in `melonDS`
+- [ ] Validate on real hardware / flashcart when available
+
+## Phase 5 — Compatibility expansion
+
+- [ ] Improve `.p8` cart compatibility beyond the current subset
+- [ ] Add `.p8.png` cart loading
+- [ ] Implement more PICO-8 API coverage
+- [ ] Add save-data, audio, and broader cart UX in the clean runtime
+
+## Phase 6 — Release candidate
+
+- [x] Produce fully built `.nds` artifacts
+- [x] Publish a GitHub prerelease
+- [x] Attach generated artifacts to the prerelease
+- [ ] Promote the clean native runtime as the default release once emulator/hardware smoke tests are solid
 
 ## Success criteria
 
-Done means:
+The project is on the right track when:
 
 - the repo is public and pushed,
-- docs exist in `docs/`,
-- the project builds a real `.nds`,
-- CI can reproduce that build,
-- and a prerelease exists with the generated artifact attached.
+- both baseline and clean native DS builds are reproducible,
+- benchmarks show where the new runtime is winning or losing,
+- and prereleases ship the generated `.nds` files for comparison.

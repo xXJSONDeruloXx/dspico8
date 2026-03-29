@@ -12,4 +12,8 @@ exec docker run --rm \
     apt-get install -y p7zip-full zip libc6-dev g++
     cd /build_dir
     make nds
+    make nds-baseline
+    mkdir -p artifacts
+    cp platform/nds-native/DSPICO8.nds artifacts/DSPICO8.nds
+    cp platform/nds/DSPICO8.nds artifacts/DSPICO8-FAKE08-BASELINE.nds
   '
